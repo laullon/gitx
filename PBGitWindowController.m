@@ -16,6 +16,8 @@
 #import "PBGitXMessageSheet.h"
 #import "PBGitSidebarController.h"
 
+#define kToolbarVisibility @"Toolbar Visibility"
+
 @implementation PBGitWindowController
 
 
@@ -40,6 +42,8 @@
 
 	if (contentController)
 		[contentController removeObserver:self forKeyPath:@"status"];
+	
+	[[[self window] toolbar] removeObserver:self forKeyPath:@"visible"];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
@@ -73,6 +77,10 @@
 
 	NSImage *terminalImage = [[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Utilities/Terminal.app/"];
 	[terminalItem setImage:terminalImage];
+	
+	BOOL isToolbarVisible = [[NSUserDefaults standardUserDefaults] boolForKey:kToolbarVisibility];
+	[[[self window] toolbar] setVisible:isToolbarVisible];
+	[[[self window] toolbar] addObserver:self forKeyPath:@"visible" options:NSKeyValueObservingOptionNew context:nil];
 
 	[self showWindow:nil];
 }
@@ -204,6 +212,12 @@
 {
     if ([(NSString *)context isEqualToString:@"statusChange"]) {
 		[self updateStatus];
+		return;
+	}
+	
+	if (object == [[self window] toolbar] && [keyPath isEqualToString:@"visible"]) {
+		[[NSUserDefaults standardUserDefaults] setBool:[[[self window] toolbar] isVisible]
+												forKey:kToolbarVisibility];
 		return;
 	}
 
