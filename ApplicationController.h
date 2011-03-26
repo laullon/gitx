@@ -36,4 +36,5 @@
 - (IBAction)reportAProblem:(id)sender;
 
 - (IBAction)showCloneRepository:(id)sender;
+- (IBAction)refreshAll:(id)sender;
 @end

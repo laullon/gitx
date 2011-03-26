@@ -134,13 +134,6 @@
 }
 
 
-- (void)windowDidBecomeKey:(NSNotification *)notification
-{
-	if ([PBGitDefaults refreshAutomatically]) {
-		[contentController refresh:nil];
-	}
-}
-
 - (void)showErrorSheetTitle:(NSString *)title message:(NSString *)message arguments:(NSArray *)arguments output:(NSString *)output
 {
 	NSString *command = [arguments componentsJoinedByString:@" "];

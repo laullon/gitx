@@ -116,6 +116,25 @@
 		[[PBRepositoryDocumentController sharedDocumentController] openDocument:self];
 }
 
+- (void)applicationDidBecomeActive:(NSNotification *)aNotification
+{
+    if ([PBGitDefaults refreshAutomatically]) {
+        [self refreshAll:self];
+    }
+}
+
+
+- (IBAction)refreshAll:(id)sender
+{
+    for (id document in [[PBRepositoryDocumentController sharedDocumentController] documents])
+    {
+        for (id windowController in [document windowControllers])
+        {
+            [windowController refresh:sender];
+        }
+    }
+}
+
 - (void) windowWillClose: sender
 {
 	[firstResponder terminate: sender];
