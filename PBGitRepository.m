@@ -315,6 +315,8 @@ NSString* PBGitRepositoryErrorDomain = @"GitXErrorDomain";
 	[self.stashController reload];
 	[self.submoduleController reload];
 
+    [[[self windowController] window] setFrameAutosaveName:[NSString stringWithFormat:@"GitX window:%@", [self displayName]]];
+    
 	[[[self windowController] window] setTitle:[self displayName]];
 }
 
