@@ -172,7 +172,6 @@
 	[commitMessageView setEditable:YES];
 	[commitMessageView setString:@""];
 	[webController setStateMessage:[NSString stringWithFormat:[[notification userInfo] objectForKey:@"description"]]];
-	[repository reloadRefs];
 }	
 
 - (void)commitFailed:(NSNotification *)notification
