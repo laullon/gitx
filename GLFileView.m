@@ -409,7 +409,12 @@
 +(BOOL)isDiffHeader:(NSString*)line
 {
 	unichar c=[line characterAtIndex:0];
-	return (c=='i') || (c=='m') || (c=='n') || (c=='d') || (c=='-') || (c=='+'); 
+	return
+		(c=='s') || // git mv: similarity index 100%
+		(c=='r') || // git mv: rename (from|to) ...
+		(c=='o') || // chmod: old mode ...
+		(c=='n') || // chmod: new mode ...
+		(c=='i') || (c=='m') || (c=='n') || (c=='d') || (c=='-') || (c=='+');
 }
 
 +(BOOL)isImage:(NSString*)file
