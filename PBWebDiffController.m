@@ -7,6 +7,7 @@
 //
 
 #import "PBWebDiffController.h"
+#import "PBGitRepository.h"
 
 
 @implementation PBWebDiffController
@@ -53,7 +54,7 @@
 - (void) openFileMerge:(NSString*)file sha:(NSString *)sha sha2:(NSString *)sha2;
 {
 	NSArray *args=[NSArray arrayWithObjects:@"difftool",@"--no-prompt",@"--tool=opendiff",sha,sha2,file,nil];
-	[repository handleInWorkDirForArguments:args];
+	[(PBGitRepository*)repository handleInWorkDirForArguments:args];
 }
 
 
