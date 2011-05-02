@@ -300,7 +300,7 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 			
 			PBChangedFile *file = [stageFiles objectAtIndex:i];
 			
-			[input appendFormat:@"%@", file.path];
+			[input appendFormat:@"%@\000", file.path];
 		}
 		
 			
@@ -356,7 +356,7 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 			
 			PBChangedFile *file = [unstageFiles objectAtIndex:i];
 			
-			[input appendString:[file indexInfo]];
+			[input appendFormat:@"%@\000", [file indexInfo]];
 		}
 		
 		int ret = 1;
