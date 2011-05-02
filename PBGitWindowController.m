@@ -244,7 +244,8 @@
 {
     splitViews=[NSArray arrayWithObjects:mainSplitView,[[sidebarController historyViewController] historySplitView], nil];
     splitViewsSize=[NSMutableArray arrayWithCapacity:[splitViews count]];
-    for (int n=0; n<[splitViews count]; n++) {
+    int n = 0;
+    for (; n<[splitViews count]; n++) {
         NSSplitView *splitView=[splitViews objectAtIndex:n];
         NSView *left=[[splitView subviews] objectAtIndex:0];
         [splitViewsSize addObject:[NSNumber numberWithInt:[left frame].size.width]];
