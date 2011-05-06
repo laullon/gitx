@@ -1828,6 +1828,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -1844,6 +1845,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};
