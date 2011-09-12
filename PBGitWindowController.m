@@ -16,6 +16,11 @@
 #import "PBGitXMessageSheet.h"
 #import "PBGitSidebarController.h"
 
+#ifndef MAC_OS_X_VERSION_10_7
+#define NSApplicationPresentationAutoHideToolbar 0
+#define NSApplicationPresentationFullScreen 0
+#endif
+
 @implementation PBGitWindowController
 
 
