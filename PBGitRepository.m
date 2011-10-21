@@ -32,6 +32,18 @@ NSString* PBGitRepositoryErrorDomain = @"GitXErrorDomain";
 @interface PBGitRepository()
 @end
 
+dispatch_queue_t PBGetWorkQueue() {
+#if 1
+	static dispatch_queue_t work_queue;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		work_queue = dispatch_queue_create("PBWorkQueue", 0);
+	});
+	return work_queue;
+#else
+	return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+#endif
+}
 
 
 @implementation PBGitRepository
@@ -250,11 +262,13 @@ NSString* PBGitRepositoryErrorDomain = @"GitXErrorDomain";
 
 - (BOOL)isBareRepository
 {
-	if([self workingDirectory]) {
-		return [PBGitRepository isBareRepository:[self workingDirectory]];
-	} else {
-		return true;
+	if(!didCheckBareRepository) {
+		if([self workingDirectory])
+			bareRepository = [PBGitRepository isBareRepository:[self workingDirectory]];
+		else
+			bareRepository = YES;
 	}
+	return bareRepository;
 }
 
 // Overridden to create our custom window controller
@@ -358,11 +372,16 @@ NSString* PBGitRepositoryErrorDomain = @"GitXErrorDomain";
 
 		PBGitRef *newRef = [PBGitRef refFromString:[components objectAtIndex:0]];
 		PBGitRevSpecifier *revSpec = [[PBGitRevSpecifier alloc] initWithRef:newRef];
-
-		[revSpec setHelpText:[self helpTextForRef:newRef]];
 		[self addBranch:revSpec];
 		[self addRef:newRef fromParameters:components];
 		[oldBranches removeObject:revSpec];
+
+		dispatch_async(PBGetWorkQueue(), ^{
+			NSString* helpText = [self helpTextForRef:newRef];
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[revSpec setHelpText:helpText];
+			});
+		});
 	}
 
 	for (PBGitRevSpecifier *branch in oldBranches)
@@ -628,12 +647,14 @@ NSString* PBGitRepositoryErrorDomain = @"GitXErrorDomain";
 
 - (NSString *) workingDirectory
 {
-	if ([self.fileURL.path hasSuffix:@"/.git"])
-		return [self.fileURL.path substringToIndex:[self.fileURL.path length] - 5];
-	else if ([[self outputForCommand:@"rev-parse --is-inside-work-tree"] isEqualToString:@"true"])
-		return [PBGitBinary path];
+	if(!workingDirectory) {
+		if ([self.fileURL.path hasSuffix:@"/.git"])
+			workingDirectory = [[self.fileURL.path substringToIndex:[self.fileURL.path length] - 5] retain];
+		else if ([[self outputForCommand:@"rev-parse --is-inside-work-tree"] isEqualToString:@"true"])
+			workingDirectory = [PBGitBinary path];
+	}
 	
-	return nil;
+	return workingDirectory;
 }
 
 #pragma mark Remotes

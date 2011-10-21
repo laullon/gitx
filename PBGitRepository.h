@@ -42,6 +42,8 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 @class PBStashController;
 @class PBSubmoduleController;
 
+dispatch_queue_t PBGetWorkQueue();
+
 @interface PBGitRepository : NSDocument {
 	PBGitHistoryList* revisionList;
 	PBGitConfig *config;
@@ -58,6 +60,10 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 	PBStashController *stashController;
 	PBSubmoduleController *submoduleController;
 	PBGitResetController *resetController;
+
+	BOOL didCheckBareRepository;
+	BOOL bareRepository;
+	NSString* workingDirectory;
 }
 @property (nonatomic, retain, readonly) PBStashController *stashController;
 @property (nonatomic, retain, readonly) PBSubmoduleController *submoduleController;
