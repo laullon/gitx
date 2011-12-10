@@ -21,6 +21,7 @@
 	IBOutlet PBCommitList *commitList;
 
 	IBOutlet NSPopUpButton *branchPopUp;
+    NSDictionary *dropInfo;
 }
 
 - (void) fetchRemote:(PBRefMenuItem *)sender;
