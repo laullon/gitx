@@ -167,6 +167,11 @@ dispatch_queue_t PBGetWorkQueue() {
 	}
 
 	[self setFileURL:gitDirURL];
+    if (![self workingDirectory]) { // If we couldn't find the working directory, assume it's the place we were opened from.
+        workingDirectory = [[absoluteURL path] retain];
+    }
+    
+        
 	[self setup];
 	return YES;
 	} @catch(id x) {
