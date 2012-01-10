@@ -9,7 +9,7 @@
 #import "PBCreateTagSheet.h"
 #import "PBGitRepository.h"
 #import "PBGitCommit.h"
-
+#import "PBGitWindowController.h"
 
 @interface PBCreateTagSheet ()
 
@@ -27,14 +27,16 @@
 @synthesize tagMessageText;
 @synthesize errorMessageField;
 
-
+static PBCreateTagSheet *sheet;
 
 #pragma mark -
 #pragma mark PBCreateTagSheet
 
 + (void) beginCreateTagSheetAtRefish:(id <PBGitRefish>)refish inRepository:(PBGitRepository *)repo
 {
-	PBCreateTagSheet *sheet = [[self alloc] initWithWindowNibName:@"PBCreateTagSheet"];
+    if (!sheet) {
+        sheet = [[self alloc] initWithWindowNibName:@"PBCreateTagSheet"];
+    }
 	[sheet beginCreateTagSheetAtRefish:refish inRepository:repo];
 }
 
@@ -57,23 +59,44 @@
 - (IBAction) createTag:(id)sender
 {
 	NSString *tagName = [self.tagNameField stringValue];
+	PBGitRef *ref = [PBGitRef refFromString:[kGitXTagRefPrefix stringByAppendingString:tagName]];
 	[self.errorMessageField setHidden:YES];
 
-	NSString *refName = [@"refs/tags/" stringByAppendingString:tagName];
-	if (![self.repository checkRefFormat:refName]) {
-		[self.errorMessageField setStringValue:@"Invalid name"];
+	if (![self.repository checkRefFormat:[ref ref]]) {
+		[self.errorMessageField setStringValue:@"Invalid name!"];
 		[self.errorMessageField setHidden:NO];
 		return;
 	}
-
-	for (PBGitRevSpecifier *rev in self.repository.branches) {
-		NSString *name = [[rev ref] tagName];
-		if ([tagName isEqualToString:name]) {
-			[self.errorMessageField setStringValue:@"Tag already exists"];
-			[self.errorMessageField setHidden:NO];
-			return;
-		}
-	}
+    
+    NSString *refExistsReturnMessage;
+    if([self.repository refExists:ref checkOnRemotesWithoutBranches:YES resultMessage:&refExistsReturnMessage])
+    {
+        NSError  *error = [NSError errorWithDomain:PBGitRepositoryErrorDomain 
+                                              code:0
+                                          userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                    refExistsReturnMessage, NSLocalizedDescriptionKey,
+                                                    @"Select other tagname.", NSLocalizedRecoverySuggestionErrorKey,
+                                                    nil]
+                           ];
+        [[NSAlert alertWithError:error]runModal];
+        return;
+    }
+    else
+    {
+        if (refExistsReturnMessage)
+        {
+            int returnButton = [[NSAlert alertWithMessageText:refExistsReturnMessage
+                                                defaultButton:@"Yes"
+                                              alternateButton:@"No"
+                                                  otherButton:nil
+                                    informativeTextWithFormat:@"Still want to create the %@ %@?",[ref refishType],[ref shortName]] runModal];
+            
+            if (returnButton == NSAlertAlternateReturn)
+            {
+                return;
+            }
+        }
+    }
 
 	[self closeCreateTagSheet:sender];
 

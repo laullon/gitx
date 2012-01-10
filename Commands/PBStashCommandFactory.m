@@ -47,18 +47,15 @@
 		command.commandDescription = @"Stashing local changes";
 		
 		PBCommandWithParameter *cmd = [[PBCommandWithParameter alloc] initWithCommand:command parameterName:@"save" parameterDisplayName:@"Stash message (optional)"];
-		[command release];
 		[commands addObject:cmd];
-		[cmd release];
 		
 		command = [[PBCommand alloc] initWithDisplayName:@"Clear stashes" parameters:[NSArray arrayWithObjects:@"stash", @"clear", nil] repository:repository];
 		command.commandTitle = command.displayName;
 		command.commandDescription = @"Clearing stashes";
 		[commands addObject:command];
-		[command release];
 	}
 	
-	return [commands autorelease];
+	return commands;
 }
 
 + (NSArray *) commandsForStash:(PBGitStash *) stash repository:(PBGitRepository *) repository {
@@ -82,7 +79,7 @@
 	command.commandDescription = [NSString stringWithFormat:@"Dropping stash: '%@'", stash];
 	[commands addObject:command];
 	
-	return [commands autorelease];
+	return commands;
 }
 
 @end

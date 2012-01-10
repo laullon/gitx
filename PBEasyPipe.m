@@ -27,7 +27,6 @@
 	NSTask* task = [[NSTask alloc] init];
 	[task setLaunchPath:cmd];
 	[task setArguments:filteredArguments];
-	[filteredArguments release];
 	if (dir)
 		[task setCurrentDirectoryPath:dir];
 

@@ -11,10 +11,13 @@
 #import "PBGitDefaults.h"
 #import "PBGitCommit.h"
 #import "PBGitRef.h"
+#import "PBGitWindowController.h"
 
 @interface PBCreateBranchSheet ()
 
 - (void) beginCreateBranchSheetAtRefish:(id <PBGitRefish>)ref inRepository:(PBGitRepository *)repo;
+@property (strong) PBGitRepository *repository;
+@property (strong) id <PBGitRefish> startRefish;
 
 @end
 
@@ -35,9 +38,14 @@
 #pragma mark -
 #pragma mark PBCreateBranchSheet
 
+static PBCreateBranchSheet *sheet;
+
+
 + (void) beginCreateBranchSheetAtRefish:(id <PBGitRefish>)ref inRepository:(PBGitRepository *)repo
 {
-	PBCreateBranchSheet *sheet = [[self alloc] initWithWindowNibName:@"PBCreateBranchSheet"];
+    if(!sheet){
+        sheet = [[self alloc] initWithWindowNibName:@"PBCreateBranchSheet"];
+    }
 	[sheet beginCreateBranchSheetAtRefish:ref inRepository:repo];
 }
 
@@ -74,17 +82,41 @@
 	PBGitRef *ref = [PBGitRef refFromString:[kGitXBranchRefPrefix stringByAppendingString:name]];
 
 	if (![self.repository checkRefFormat:[ref ref]]) {
-		[self.errorMessageField setStringValue:@"Invalid name"];
+		[self.errorMessageField setStringValue:@"Invalid name!"];
 		[self.errorMessageField setHidden:NO];
 		return;
 	}
-
-	if ([self.repository refExists:ref]) {
-		[self.errorMessageField setStringValue:@"Branch already exists"];
-		[self.errorMessageField setHidden:NO];
-		return;
-	}
-
+    
+    NSString *refExistsReturnMessage;
+    if([self.repository refExists:ref checkOnRemotesWithoutBranches:YES resultMessage:&refExistsReturnMessage])
+    {
+        NSError  *error = [NSError errorWithDomain:PBGitRepositoryErrorDomain 
+                                              code:0
+                                          userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                    refExistsReturnMessage, NSLocalizedDescriptionKey,
+                                                    @"Select other branchname.", NSLocalizedRecoverySuggestionErrorKey,
+                                                    nil]
+                           ];
+        [[NSAlert alertWithError:error]runModal];
+        return;
+    }
+    else
+    {
+        if (refExistsReturnMessage)
+        {
+           int returnButton = [[NSAlert alertWithMessageText:refExistsReturnMessage
+                             defaultButton:@"Yes"
+                           alternateButton:@"No"
+                               otherButton:nil
+                 informativeTextWithFormat:@"Still want to create the %@ %@?",[ref refishType],[ref shortName]] runModal];
+            
+            if (returnButton == NSAlertAlternateReturn)
+            {
+                return;
+            }
+        }
+    }
+	
 	[self closeCreateBranchSheet:self];
 
 	[self.repository createBranch:name atRefish:self.startRefish];

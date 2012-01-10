@@ -13,15 +13,7 @@
 @class PBGitRepository;
 
 
-@interface PBCreateBranchSheet : NSWindowController {
-	PBGitRepository *repository;
-	id <PBGitRefish> startRefish;
-
-	BOOL shouldCheckoutBranch;
-
-	NSTextField *branchNameField;
-	NSTextField *errorMessageField;
-}
+@interface PBCreateBranchSheet : NSWindowController 
 
 + (void) beginCreateBranchSheetAtRefish:(id <PBGitRefish>)ref inRepository:(PBGitRepository *)repo;
 
@@ -30,12 +22,9 @@
 - (IBAction) closeCreateBranchSheet:(id)sender;
 
 
-@property (retain) PBGitRepository *repository;
-@property (retain) id <PBGitRefish> startRefish;
-
 @property (assign) BOOL shouldCheckoutBranch;
 
-@property (assign) IBOutlet NSTextField *branchNameField;
-@property (assign) IBOutlet NSTextField *errorMessageField;
+@property (strong) IBOutlet NSTextField *branchNameField;
+@property (strong) IBOutlet NSTextField *errorMessageField;
 
 @end

@@ -18,6 +18,11 @@
 @end
 
 @implementation PBGitIndexController
+- (void)dealloc
+{
+    actFiles = Nil;
+}
+
 
 - (void)awakeFromNib
 {
@@ -123,7 +128,6 @@
 				[ignoreItem setTarget:self];
 				[ignoreItem setRepresentedObject:extension];
 				[menu addItem:ignoreItem];
-				[ignoreItem release];
 			}
 		}
 	}
@@ -192,7 +196,6 @@
 	
 	
 	[self ignoreFiles:[NSArray arrayWithObject:file]];
-	[file release];
 	[commitController.index refresh];
 }
 
@@ -226,7 +229,7 @@
     [[alert window] orderOut:nil];
 
 	if (returnCode == NSAlertDefaultReturn) {
-        [commitController.index discardChangesForFiles:contextInfo];
+        [commitController.index discardChangesForFiles:actFiles];
 	}
 }
 
@@ -241,7 +244,8 @@
         [alert beginSheetModalForWindow:[[commitController view] window]
                           modalDelegate:self
                          didEndSelector:@selector(discardChangesForFilesAlertDidEnd:returnCode:contextInfo:)
-                            contextInfo:files];
+                            contextInfo:Nil];
+        actFiles = files;
 	} else {
         [commitController.index discardChangesForFiles:files];
     }

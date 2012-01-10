@@ -19,7 +19,7 @@
 + (id)branchItemWithRevSpec:(PBGitRevSpecifier *)revSpecifier;
 
 @property (assign) BOOL isCheckedOut;
-@property (assign) NSNumber *behind;
-@property (assign) NSNumber *ahead;
+@property (strong) NSNumber *behind;
+@property (strong) NSNumber *ahead;
 
 @end

@@ -23,8 +23,8 @@
 	IBOutlet PBGitRepository *repository;
 }
 
-@property (retain) NSString *startFile;
-@property (retain) PBGitRepository *repository;
+@property (strong) NSString *startFile;
+@property (strong) PBGitRepository *repository;
 
 - (WebScriptObject *) script;
 - (void) closeView;

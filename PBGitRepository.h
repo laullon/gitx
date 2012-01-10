@@ -49,8 +49,6 @@ dispatch_queue_t PBGetWorkQueue();
 	PBGitConfig *config;
 
 	BOOL hasChanged;
-	NSMutableArray *branches;
-	PBGitRevSpecifier *currentBranch;
 	NSInteger currentBranchFilter;
 	NSMutableDictionary *refs;
 
@@ -65,9 +63,10 @@ dispatch_queue_t PBGetWorkQueue();
 	BOOL bareRepository;
 	NSString* workingDirectory;
 }
-@property (nonatomic, retain, readonly) PBStashController *stashController;
-@property (nonatomic, retain, readonly) PBSubmoduleController *submoduleController;
-@property (nonatomic, retain, readonly) PBGitResetController *resetController;
+
+@property (nonatomic, strong, readonly) PBStashController *stashController;
+@property (nonatomic, strong, readonly) PBSubmoduleController *submoduleController;
+@property (nonatomic, strong, readonly) PBGitResetController *resetController;
 
 - (void) cloneRepositoryToPath:(NSString *)path bare:(BOOL)isBare;
 - (void) beginAddRemote:(NSString *)remoteName forURL:(NSString *)remoteURL;
@@ -79,9 +78,13 @@ dispatch_queue_t PBGetWorkQueue();
 - (BOOL) mergeWithRefish:(id <PBGitRefish>)ref;
 - (BOOL) cherryPickRefish:(id <PBGitRefish>)ref;
 - (BOOL) rebaseBranch:(id <PBGitRefish>)branch onRefish:(id <PBGitRefish>)upstream;
+- (BOOL) renameRef:(PBGitRef*)ref withNewName:(NSString *)newName;
 - (BOOL) createBranch:(NSString *)branchName atRefish:(id <PBGitRefish>)ref;
 - (BOOL) createTag:(NSString *)tagName message:(NSString *)message atRefish:(id <PBGitRefish>)commitSHA;
 - (BOOL) deleteRemote:(PBGitRef *)ref;
+- (BOOL) isRemoteConnected:(NSString*)remoteName;
+- (BOOL) deleteRemoteBranch:(PBGitRef *)ref;
+- (BOOL) deleteRemoteTag:(PBGitRef *)ref;
 - (BOOL) deleteRef:(PBGitRef *)ref;
 
 - (BOOL) hasSvnRemote;
@@ -125,7 +128,10 @@ dispatch_queue_t PBGetWorkQueue();
 - (BOOL)isSHAOnHeadBranch:(NSString *)testSHA;
 - (BOOL)isRefOnHeadBranch:(PBGitRef *)testRef;
 - (BOOL)checkRefFormat:(NSString *)refName;
-- (BOOL)refExists:(PBGitRef *)ref;
+- (BOOL)refExists:(PBGitRef *)ref checkOnRemotesWithoutBranches:(BOOL)remoteCheck resultMessage:(NSString**)result;
+- (BOOL)refExistsOnRemote:(PBGitRef*)ref remoteName:(NSString*)remote resultMessage:(NSString**)result;
+- (BOOL)refExistsOnAnyRemote:(PBGitRef*)ref resultMessage:(NSString**)result;
+- (BOOL)tagExistsOnRemote:(PBGitRef *)ref remoteName:(NSString *)remote;
 - (PBGitRef *)refForName:(NSString *)name;
 
 - (NSArray *) remotes;
@@ -154,12 +160,16 @@ dispatch_queue_t PBGetWorkQueue();
 - (NSMenu *) menu;
 +(bool)isLocalBranch:(NSString *)branch branchNameInto:(NSString **)name;
 
+- (NSString*) remoteUrl:(NSString*)remoteName;
+- (void) changeRemote:(PBGitRef *)ref toURL:(NSURL*)newUrl;
+
+
 @property (assign) BOOL hasChanged;
 @property (readonly) PBGitWindowController *windowController;
 @property (readonly) PBGitConfig *config;
-@property (retain) PBGitHistoryList *revisionList;
-@property (assign) NSMutableArray* branches;
-@property (assign) PBGitRevSpecifier *currentBranch;
+@property (strong) PBGitHistoryList *revisionList;
+@property (strong) NSMutableArray* branches;
+@property (strong) PBGitRevSpecifier *currentBranch;
 @property (assign) NSInteger currentBranchFilter;
-@property (retain) NSMutableDictionary* refs;
+@property (strong) NSMutableDictionary* refs;
 @end

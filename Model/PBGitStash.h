@@ -16,10 +16,10 @@
 	NSString *name;
 	NSString *message;
 }
-@property (nonatomic, retain, readonly) NSString *name;
-@property (nonatomic, retain, readonly) NSString *message;
-@property (nonatomic, retain, readonly) NSString *stashSourceMessage;
-@property (nonatomic, retain, readonly) NSString *stashRawString;
+@property (nonatomic, strong, readonly) NSString *name;
+@property (nonatomic, strong, readonly) NSString *message;
+@property (nonatomic, strong, readonly) NSString *stashSourceMessage;
+@property (nonatomic, strong, readonly) NSString *stashRawString;
 
 - initWithRawStashLine:(NSString *) stashLineFromStashListOutput;
 @end

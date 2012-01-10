@@ -61,13 +61,14 @@ OSStatus			StorePasswordKeychain (const char *url, UInt32 urlLength, void* passw
     [alert setMessageText:[NSString stringWithFormat:@"%@?",url]];
     [alert setInformativeText:prompt];
     [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     NSInteger result = [alert runModal];
 
-    Boolean yes=NO;
+    BOOL yes=NO;
     if ( result == NSAlertFirstButtonReturn ) {
         yes=YES;
     }
-    [alert release];
     printf("%s",yes?"yes":"no");
 }
 
@@ -94,6 +95,8 @@ OSStatus			StorePasswordKeychain (const char *url, UInt32 urlLength, void* passw
     [alert setAccessoryView:passView]; 
     [alert setShowsSuppressionButton:YES];
     [[alert suppressionButton] setTitle:@"Save on keychain"];
+    
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     NSInteger result = [alert runModal];
     if ( result == NSAlertFirstButtonReturn ) {
         NSString *pas=[passView stringValue];
@@ -106,7 +109,6 @@ OSStatus			StorePasswordKeychain (const char *url, UInt32 urlLength, void* passw
         }
     }
     
-    [alert release];
 }
 
 @end

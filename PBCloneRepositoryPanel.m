@@ -19,7 +19,8 @@
 @synthesize repositoryURL;
 @synthesize destinationPath;
 @synthesize errorMessage;
-@synthesize repositoryAccessoryView;
+@synthesize browseRepositoryPanelAccessoryView;
+@synthesize browseDestinationPanelAccessoryView;
 
 @synthesize isBare;
 
@@ -35,7 +36,7 @@
 
 + (void)beginCloneRepository:(NSString *)repository toURL:(NSURL *)targetURL isBare:(BOOL)bare
 {
-	if (!repository || [repository isEqualToString:@""] || !targetURL || [[targetURL path] isEqualToString:@""])
+	if ((!repository) || [repository isEqualToString:@""] || (!targetURL) || [[targetURL path] isEqualToString:@""])
 		return;
 
 	PBCloneRepositoryPanel *clonePanel = [PBCloneRepositoryPanel panel];
@@ -65,7 +66,7 @@
     [browseRepositoryPanel setCanChooseDirectories:YES];
     [browseRepositoryPanel setAllowsMultipleSelection:NO];
 	[browseRepositoryPanel setCanCreateDirectories:NO];
-	[browseRepositoryPanel setAccessoryView:repositoryAccessoryView];
+	[browseRepositoryPanel setAccessoryView:browseRepositoryPanelAccessoryView];
 	
 	browseDestinationPanel = [NSOpenPanel openPanel];
 	[browseDestinationPanel setTitle:@"Browse clone destination"];
@@ -75,6 +76,7 @@
     [browseDestinationPanel setCanChooseDirectories:YES];
     [browseDestinationPanel setAllowsMultipleSelection:NO];
 	[browseDestinationPanel setCanCreateDirectories:YES];
+	[browseDestinationPanel setAccessoryView:browseDestinationPanelAccessoryView];
 }
 
 
@@ -87,7 +89,7 @@
 	[alert beginSheetModalForWindow:[self window]
 					  modalDelegate:self 
 					 didEndSelector:@selector(messageSheetDidEnd:returnCode:contextInfo:)
-						contextInfo:NULL];
+						contextInfo:Nil];
 }
 
 
@@ -111,7 +113,9 @@
 
 - (IBAction) clone:(id)sender
 {
-	[self.errorMessage setStringValue:@""];
+	[self.window resignKeyWindow];
+    
+    [self.errorMessage setStringValue:@""];
 	
 	NSString *url = [self.repositoryURL stringValue];
 	if ([url isEqualToString:@""]) {
@@ -137,56 +141,57 @@
 
 - (IBAction) browseRepository:(id)sender
 {
-    [browseRepositoryPanel beginSheetForDirectory:nil file:nil types:nil
-								   modalForWindow:[self window]
-									modalDelegate:self
-								   didEndSelector:@selector(browseRepositorySheetDidEnd:returnCode:contextInfo:)
-									  contextInfo:NULL];
+    [browseRepositoryPanel beginSheetModalForWindow:[self window]
+                        completionHandler:
+     ^(NSInteger result) 
+     {
+         [browseRepositoryPanel orderOut:self];
+         
+         if (result == NSFileHandlingPanelOKButton) 
+         {
+             [self.repositoryURL setStringValue:[[browseRepositoryPanel URL] path]];
+         }
+     }
+     ];
 }
 
 
 - (IBAction) showHideHiddenFiles:(id)sender
 {
-	// This uses undocumented OpenPanel features to show hidden files (required for 10.5 support)
-	NSNumber *showHidden = [NSNumber numberWithBool:[sender state] == NSOnState];
-	[[browseRepositoryPanel valueForKey:@"_navView"] setValue:showHidden forKey:@"showsHiddenFiles"];
+    if ([sender tag] == 0)
+    {
+        [browseRepositoryPanel setShowsHiddenFiles:[sender state]];
+    }
+    else
+    {
+        [browseDestinationPanel setShowsHiddenFiles:[sender state]];
+    }
 }
 
 
 - (IBAction) browseDestination:(id)sender
 {
-    [browseDestinationPanel beginSheetForDirectory:nil file:nil types:nil
-									modalForWindow:[self window]
-									 modalDelegate:self
-									didEndSelector:@selector(browseDestinationSheetDidEnd:returnCode:contextInfo:)
-									   contextInfo:NULL];
+    [browseDestinationPanel beginSheetModalForWindow:[self window]
+                                  completionHandler:
+     ^(NSInteger result) 
+     {
+         [browseDestinationPanel orderOut:self];
+         
+         if (result == NSFileHandlingPanelOKButton) 
+         {
+             [self.destinationPath setStringValue:[[browseDestinationPanel URL] path]];
+         }
+     }
+     ];
 }
 
+- (IBAction) bareCheckBoxChanged:(NSButton*)sender
+{
+    isBare = sender.state;
+}
 
 
 #pragma mark Callbacks
-
-- (void) browseRepositorySheetDidEnd:(NSOpenPanel *)sheet returnCode:(NSInteger)code contextInfo:(void *)info
-{
-    [sheet orderOut:self];
-	
-    if (code == NSOKButton) {
-		NSURL *url = [[sheet URLs] lastObject];
-		[self.repositoryURL setStringValue:[url path]];
-	}
-}
-
-
-- (void) browseDestinationSheetDidEnd:(NSOpenPanel *)sheet returnCode:(NSInteger)code contextInfo:(void *)info
-{
-    [sheet orderOut:self];
-	
-    if (code == NSOKButton) {
-		NSURL *url = [[sheet URLs] lastObject];
-		[self.destinationPath setStringValue:[url path]];
-	}
-}
-
 
 - (void) messageSheetDidEnd:(NSOpenPanel *)sheet returnCode:(NSInteger)code contextInfo:(void *)info
 {

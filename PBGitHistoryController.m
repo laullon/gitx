@@ -15,7 +15,6 @@
 #import "PBCreateBranchSheet.h"
 #import "PBCreateTagSheet.h"
 #import "PBAddRemoteSheet.h"
-#import "PBGitSidebarController.h"
 #import "PBGitGradientBarView.h"
 #import "PBDiffWindowController.h"
 #import "PBGitDefaults.h"
@@ -228,26 +227,28 @@
 	}
 }
 
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)ctx
 {
-    if ([(NSString *)context isEqualToString: @"commitChange"]) {
+    NSString *context = (__bridge NSString *)ctx;
+    
+    if ([context isEqualToString: @"commitChange"]) {
 		[self updateKeys];
 		[self restoreFileBrowserSelection];
 		[self updateSearch:filesSearchField];
-	}else if ([(NSString *)context isEqualToString: @"treeChange"]) {
+	}else if ([context isEqualToString: @"treeChange"]) {
 		[self updateQuicklookForce: NO];
 		[self saveFileBrowserSelection];
-	}else if([(NSString *)context isEqualToString:@"branchChange"]) {
+	}else if([context isEqualToString:@"branchChange"]) {
 		// Reset the sorting
 		if ([[commitController sortDescriptors] count])
 			[commitController setSortDescriptors:[NSArray array]];
 		[self updateBranchFilterMatrix];
-	}else if([(NSString *)context isEqualToString:@"updateRefs"]) {
+	}else if([context isEqualToString:@"updateRefs"]) {
 		[commitController rearrangeObjects];
-	}else if ([(NSString *)context isEqualToString:@"branchFilterChange"]) {
+	}else if ([context isEqualToString:@"branchFilterChange"]) {
 		[PBGitDefaults setBranchFilter:repository.currentBranchFilter];
 		[self updateBranchFilterMatrix];
-	}else if([(NSString *)context isEqualToString:@"updateCommitCount"] || [(NSString *)context isEqualToString:@"revisionListUpdating"]) {
+	}else if([context isEqualToString:@"updateCommitCount"] || [(NSString *)context isEqualToString:@"revisionListUpdating"]) {
 		[self updateStatus];
 
 		if (selectedCommitBeforeRefresh && [repository commitForSHA:[selectedCommitBeforeRefresh sha]])
@@ -257,7 +258,7 @@
 		else
 			[self selectCommit:[[self firstCommit] sha]];
 	}else{
-		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+		[super observeValueForKeyPath:keyPath ofObject:object change:change context:ctx];
 	}
 
 }
@@ -499,6 +500,12 @@
 	[super closeView];
 }
 
+- (IBAction)loadAllCommits:(id)sender {
+    repository.revisionList.reloadAll = ((NSButton *)sender).state;
+    [self refresh:sender];
+}
+
+
 #pragma mark Table Column Methods
 - (NSMenu *)tableColumnMenu
 {
@@ -688,7 +695,7 @@
 
 - (IBAction) showAddRemoteSheet:(id)sender
 {
-	[PBAddRemoteSheet beginAddRemoteSheetForRepository:self.repository];
+	[PBAddRemoteSheet beginAddRemoteSheetForRepository:self.repository withRemoteURL:Nil];
 }
 
 - (IBAction) merge:(id)sender

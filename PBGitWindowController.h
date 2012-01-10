@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "PBGitRepository.h"
+#import "GlobalProtocols.h"
 
 #define kGitSplitViewMinWidth 150.0f
 #define kGitSplitViewMaxWidth 300.0f
@@ -15,8 +16,7 @@
 @class PBViewController, PBGitSidebarController, PBGitCommitController;
 
 // Controls the main repository window from RepositoryWindow.xib
-@interface PBGitWindowController : NSWindowController PROTOCOL_10_6(NSWindowDelegate){
-	__weak PBGitRepository* repository;
+@interface PBGitWindowController : NSWindowController PROTOCOL_10_6(NSWindowDelegate,Messages){
 
 	PBViewController *contentController;
 
@@ -34,9 +34,11 @@
     
     NSArray *splitViews;
     NSMutableArray *splitViewsSize;
+    BOOL addRemoteAfterCloneTo;
+    NSString *remoteURL;
 }
 
-@property (assign) __weak PBGitRepository *repository;
+@property (strong) PBGitRepository *repository;
 
 - (id)initWithRepository:(PBGitRepository*)theRepository displayDefault:(BOOL)display;
 

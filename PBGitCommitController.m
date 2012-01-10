@@ -128,11 +128,6 @@
 
 - (void) commitWithVerification:(BOOL) doVerify
 {
-	if ([[NSFileManager defaultManager] fileExistsAtPath:[repository.fileURL.path stringByAppendingPathComponent:@"MERGE_HEAD"]]) {
-		[[repository windowController] showMessageSheet:@"Cannot commit merges" infoText:@"GitX cannot commit merges yet. Please commit your changes from the command line."];
-		return;
-	}
-
 	if ([[cachedFilesController arrangedObjects] count] == 0) {
 		[[repository windowController] showMessageSheet:@"No changes to commit" infoText:@"You must first stage some changes before committing"];
 		return;
@@ -144,6 +139,11 @@
 		return;
 	}
 
+	if ([[NSFileManager defaultManager] fileExistsAtPath:[repository.fileURL.path stringByAppendingPathComponent:@"MERGE_HEAD"]]) {
+        [index commitMergeWithMessage:commitMessage];
+		return;
+	}
+    
 	[cachedFilesController setSelectionIndexes:[NSIndexSet indexSet]];
 	[unstagedFilesController setSelectionIndexes:[NSIndexSet indexSet]];
 

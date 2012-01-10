@@ -12,11 +12,9 @@
 @class PBGitRepository;
 
 @interface PBStashController : NSObject {
-    NSArray *stashes;
 @private
     PBGitRepository *repository;
 }
-@property (nonatomic, retain, readonly) NSArray *stashes;
 
 - (id) initWithRepository:(PBGitRepository *) repo;
 

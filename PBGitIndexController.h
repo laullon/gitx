@@ -15,7 +15,8 @@
 	IBOutlet PBGitCommitController *commitController;
 
 	IBOutlet NSTableView *unstagedTable;
-	IBOutlet NSTableView *stagedTable;	
+	IBOutlet NSTableView *stagedTable;
+	NSArray *actFiles;
 }
 
 - (IBAction) rowClicked:(NSCell *) sender;

@@ -7,13 +7,16 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "GlobalProtocols.h"
 
 
-@interface PBCloneRepositoryPanel : NSWindowController {
+@interface PBCloneRepositoryPanel : NSWindowController <Messages> {
 	NSTextField *repositoryURL;
 	NSTextField *destinationPath;
 	NSTextField *errorMessage;
-	NSView      *repositoryAccessoryView;
+	
+    NSView      *browseRepositoryPanelAccessoryView;
+    NSView      *browseDestinationPanelAccessoryView;
 
 	NSOpenPanel *browseRepositoryPanel;
 	NSOpenPanel *browseDestinationPanel;
@@ -33,11 +36,13 @@
 - (IBAction) browseRepository:(id)sender;
 - (IBAction) showHideHiddenFiles:(id)sender;
 - (IBAction) browseDestination:(id)sender;
+- (IBAction) bareCheckBoxChanged:(NSButton*)sender;
 
-@property (assign) IBOutlet NSTextField *repositoryURL;
-@property (assign) IBOutlet NSTextField *destinationPath;
-@property (assign) IBOutlet NSTextField *errorMessage;
-@property (assign) IBOutlet NSView      *repositoryAccessoryView;
+@property (strong) IBOutlet NSTextField *repositoryURL;
+@property (strong) IBOutlet NSTextField *destinationPath;
+@property (strong) IBOutlet NSTextField *errorMessage;
+@property (strong) IBOutlet NSView      *browseRepositoryPanelAccessoryView;
+@property (strong) IBOutlet NSView      *browseDestinationPanelAccessoryView;
 
 @property (assign) BOOL isBare;
 

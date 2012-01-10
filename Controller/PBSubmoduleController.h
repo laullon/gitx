@@ -13,11 +13,10 @@
 @class PBCommand;
 
 @interface PBSubmoduleController : NSObject {
-	NSArray *submodules;
 @private
 	PBGitRepository *repository;
+    NSArray *submodules;
 }
-@property (nonatomic, retain, readonly) NSArray *submodules;
 
 - (id) initWithRepository:(PBGitRepository *) repo;
 

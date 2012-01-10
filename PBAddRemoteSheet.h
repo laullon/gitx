@@ -20,9 +20,11 @@
 
 	NSOpenPanel *browseSheet;
 	NSView      *browseAccessoryView;
+    
+    NSString *remoteUrl;
 }
 
-+ (void) beginAddRemoteSheetForRepository:(PBGitRepository *)repo;
++ (void) beginAddRemoteSheetForRepository:(PBGitRepository *)repo withRemoteURL:(NSString*)url;
 
 - (IBAction) browseFolders:(id)sender;
 - (IBAction) addRemote:(id)sender;
@@ -30,13 +32,13 @@
 - (IBAction) showHideHiddenFiles:(id)sender;
 
 
-@property (readwrite) PBGitRepository *repository;
+@property(strong) PBGitRepository *repository;
 
-@property (readwrite) IBOutlet NSTextField *remoteName;
-@property (readwrite) IBOutlet NSTextField *remoteURL;
-@property (readwrite) IBOutlet NSTextField *errorMessage;
+@property(strong) IBOutlet NSTextField *remoteName;
+@property(strong) IBOutlet NSTextField *remoteURL;
+@property(strong) IBOutlet NSTextField *errorMessage;
 
-@property (readwrite)          NSOpenPanel *browseSheet;
-@property (readwrite) IBOutlet NSView      *browseAccessoryView;
+@property(strong)          NSOpenPanel *browseSheet;
+@property(strong) IBOutlet NSView      *browseAccessoryView;
 
 @end

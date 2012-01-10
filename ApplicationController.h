@@ -7,7 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitRepository.h"
 
 @class PBCloneRepositoryPanel;
 
@@ -21,6 +20,7 @@
 
 	PBCloneRepositoryPanel *cloneRepositoryPanel;
     
+    NSDictionary *notificationUserInfo;
 }
 
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator;

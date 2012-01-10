@@ -146,6 +146,58 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 	return parent;
 }
 
+
+- (void)commitMergeWithMessage:(NSString *)commitMessage
+{
+	NSMutableString *commitSubject = [@"commit: " mutableCopy];
+	NSRange newLine = [commitMessage rangeOfString:@"\n"];
+	if (newLine.location == NSNotFound)
+		[commitSubject appendString:commitMessage];
+	else
+		[commitSubject appendString:[commitMessage substringToIndex:newLine.location]];
+	
+	NSString *commitMessageFile;
+	commitMessageFile = [repository.fileURL.path stringByAppendingPathComponent:@"COMMIT_EDITMSG"];
+	
+	[commitMessage writeToFile:commitMessageFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
+	NSArray *arguments = [NSArray arrayWithObjects:@"commit", @"-m", commitMessage, nil];
+        
+    int ret = 1;
+ 	NSString *output = [repository outputInWorkdirForArguments:arguments retValue: &ret];
+    
+    NSMutableDictionary *userInfo = [NSMutableDictionary new];
+    
+	if (!ret)
+    {
+        [userInfo setObject:[NSNumber numberWithInt:YES] forKey:@"success"];
+        
+        NSString *sha = [repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"log", @"-n1", @"--pretty=%H", nil] retValue: &ret];
+        [userInfo setObject:sha forKey:@"sha"];
+
+        [userInfo setObject:[NSString stringWithFormat:@"Successfully created merge commit %@", sha] forKey:@"description"];
+        
+        repository.hasChanged = YES;
+        [repository reloadRefs];
+        
+        amendEnvironment = nil;
+        if (amend)
+            self.amend = NO;
+        else
+            [self refresh];
+    }
+	else
+    {
+        [userInfo setObject:[NSNumber numberWithInt:NO] forKey:@"success"];
+        [userInfo setObject:[NSString stringWithFormat:@"Commiting the merge occurs an error - %@",output] forKey:@"description"];
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexFinishedCommit
+                                                        object:self
+                                                      userInfo:userInfo];
+}
+
+
 // TODO: make Asynchronous
 - (void)commitWithMessage:(NSString *)commitMessage andVerify:(BOOL) doVerify
 {

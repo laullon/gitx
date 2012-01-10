@@ -14,16 +14,11 @@
 
 - initWithCommandWithParameter:(PBCommandWithParameter *) aCommand {
 	if ((self = [super initWithWindowNibName:@"PBArgumentPicker" owner:self])) {
-		cmdWithParameter = [aCommand retain];
+		cmdWithParameter = aCommand;
 	}
 	return self;
 }
 
-- (void) dealloc {
-	[cmdWithParameter release];
-
-	[super dealloc];
-}
 
 - (void) awakeFromNib {
 	NSString *stringToDisplay = [NSString stringWithFormat:@"%@:", [cmdWithParameter parameterDisplayName]];

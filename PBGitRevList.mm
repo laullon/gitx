@@ -47,10 +47,11 @@ using namespace std;
 }
 
 
-- (void) loadRevisons
+- (void) loadRevisons:(BOOL)all
 {
 	[parseThread cancel];
 
+    reloadAll = all;
 	parseThread = [[NSThread alloc] initWithTarget:self selector:@selector(walkRevisionListWithSpecifier:) object:currentRev];
 	self.isParsing = YES;
 	resetCommits = YES;
@@ -109,6 +110,11 @@ using namespace std;
 		formatString = [@"%m\01" stringByAppendingString:formatString];
 	
 	NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"log", @"-z", @"--topo-order", @"--children", formatString, nil];
+    
+    if(!reloadAll){
+        [arguments insertObject:@"-n" atIndex:1];
+        [arguments insertObject:@"500" atIndex:2];
+    }
 
 	if (!rev)
 		[arguments addObject:@"HEAD"];
@@ -152,7 +158,7 @@ using namespace std;
 			if (encodingMap.find(encoding_str) != encodingMap.end()) {
 				encoding = encodingMap[encoding_str];
 			} else {
-				encoding = CFStringConvertEncodingToNSStringEncoding(CFStringConvertIANACharSetNameToEncoding((CFStringRef)[NSString stringWithUTF8String:encoding_str.c_str()]));
+				encoding = CFStringConvertEncodingToNSStringEncoding(CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)[NSString stringWithUTF8String:encoding_str.c_str()]));
 				encodingMap[encoding_str] = encoding;
 			}
 		}

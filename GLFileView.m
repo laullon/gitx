@@ -269,7 +269,7 @@
 	NSArray *lines = [txt componentsSeparatedByString:@"\n"];
 	NSMutableString *res=[NSMutableString string];
 	[res appendString:@"<table id='filelist'>"];
-	for (NSString *line in lines) {
+	for (__strong NSString *line in lines) {
 		if([line length]<98) continue;
 		line=[line substringFromIndex:97];
 		NSArray *fileStatus=[line componentsSeparatedByString:@"\t"];
@@ -499,11 +499,12 @@
     NSInteger i=[name rangeOfString:@"." options:NSBackwardsSearch].location;
     if(i!=NSNotFound){
         NSString *ext=[name substringFromIndex:i+1];
-        CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (CFStringRef)ext, NULL);
+        CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)ext, NULL);
         if(UTI){
             CFStringRef registeredType = UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType);
             if(registeredType){
-                mimeType = NSMakeCollectable(registeredType);
+                mimeType = [NSString stringWithFormat:@"%@",registeredType];
+                CFRelease(registeredType);
             }
             CFRelease(UTI);
         }

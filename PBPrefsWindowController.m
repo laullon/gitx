@@ -64,7 +64,6 @@
 	[openPanel setTreatsFilePackagesAsDirectories:YES];
 	[openPanel setAccessoryView:gitPathOpenAccessory];
 	[openPanel setResolvesAliases:NO];
-	//[[openPanel _navView] setShowsHiddenFiles:YES];
 
 	gitPathOpenPanel = openPanel;
 }
@@ -79,9 +78,7 @@
 
 - (IBAction) showHideAllFiles: sender
 {
-	/* FIXME: This uses undocumented OpenPanel features to show hidden files! */
-	NSNumber *showHidden = [NSNumber numberWithBool:[sender state] == NSOnState];
-	[[gitPathOpenPanel valueForKey:@"_navView"] setValue:showHidden forKey:@"showsHiddenFiles"];
+    [gitPathOpenPanel setShowsHiddenFiles:[sender state]];
 }
 
 @end

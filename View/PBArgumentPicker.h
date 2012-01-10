@@ -15,10 +15,10 @@
 	IBOutlet NSButton *okButton;
 	IBOutlet NSButton *cancelButton;
 }
-@property (nonatomic, retain, readonly) NSTextField *textField;
-@property (nonatomic, retain, readonly) NSTextField *label;
-@property (nonatomic, retain, readonly) NSButton *okButton;
-@property (nonatomic, retain, readonly) NSButton *cancelButton;
+@property (nonatomic, strong, readonly) NSTextField *textField;
+@property (nonatomic, strong, readonly) NSTextField *label;
+@property (nonatomic, strong, readonly) NSButton *okButton;
+@property (nonatomic, strong, readonly) NSButton *cancelButton;
 
 
 @end

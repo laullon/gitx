@@ -12,12 +12,16 @@
 
 @implementation PBCommitHookFailedSheet
 
+static PBCommitHookFailedSheet *sheet;
+
 #pragma mark -
 #pragma mark PBCommitHookFailedSheet
 
 + (void)beginMessageSheetForWindow:(NSWindow *)parentWindow withMessageText:(NSString *)message infoText:(NSString *)info commitController:(PBGitCommitController *)controller 
 {
-	PBCommitHookFailedSheet *sheet = [[self alloc] initWithWindowNibName:@"PBCommitHookFailedSheet" andController:controller];
+    if (!sheet) {
+        sheet = [[self alloc] initWithWindowNibName:@"PBCommitHookFailedSheet" andController:controller];
+    }
 	[sheet beginMessageSheetForWindow:parentWindow withMessageText:message infoText:info];
 }
 

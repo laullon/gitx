@@ -26,8 +26,8 @@
 #import "PBSubmoduleController.h"
 #import "PBStashContentController.h"
 
-static NSString * const kObservingContextStashes = @"stashesChanged";
-static NSString * const kObservingContextSubmodules = @"submodulesChanged";
+NSString *kObservingContextStashes = @"stashesChanged";
+NSString *kObservingContextSubmodules = @"submodulesChanged";
 
 @interface PBGitSidebarController ()
 
@@ -70,8 +70,8 @@ static NSString * const kObservingContextSubmodules = @"submodulesChanged";
 	[repository addObserver:self forKeyPath:@"refs" options:0 context:@"updateRefs"];
 	[repository addObserver:self forKeyPath:@"currentBranch" options:0 context:@"currentBranchChange"];
 	[repository addObserver:self forKeyPath:@"branches" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:@"branchesModified"];
-	[repository addObserver:self forKeyPath:@"stashController.stashes" options:NSKeyValueObservingOptionNew context:kObservingContextStashes];
-	[repository addObserver:self forKeyPath:@"submoduleController.submodules" options:NSKeyValueObservingOptionNew context:kObservingContextSubmodules];
+	[repository addObserver:self forKeyPath:@"stashController.stashes" options:NSKeyValueObservingOptionNew context:(__bridge void *)kObservingContextStashes];
+	[repository addObserver:self forKeyPath:@"submoduleController.submodules" options:NSKeyValueObservingOptionNew context:(__bridge void *)kObservingContextSubmodules];
 	
 	
 	[self menuNeedsUpdate:[actionButton menu]];
@@ -101,10 +101,10 @@ static NSString * const kObservingContextSubmodules = @"submodulesChanged";
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if ([@"currentBranchChange" isEqualToString:context]) {
+	if ([@"currentBranchChange" isEqualToString:(__bridge NSString *)context]) {
 		[sourceView reloadData];
 		[self selectCurrentBranch];
-	}else if ([@"branchesModified" isEqualToString:context]) {
+	}else if ([@"branchesModified" isEqualToString:(__bridge NSString *)context]) {
 		NSInteger changeKind = [(NSNumber *)[change objectForKey:NSKeyValueChangeKindKey] intValue];
 		
 		if (changeKind == NSKeyValueChangeInsertion) {
@@ -120,7 +120,7 @@ static NSString * const kObservingContextSubmodules = @"submodulesChanged";
 			for (PBGitRevSpecifier *rev in removedRevSpecs)
 				[self removeRevSpec:rev];
 		}
-	} else if ([kObservingContextStashes isEqualToString:context]) {		// isEqualToString: is not needed here
+	} else if ([kObservingContextStashes isEqualToString:(__bridge NSString *)context]) {		// isEqualToString: is not needed here
 		[stashes.children removeAllObjects];
 		NSArray *newStashes = [change objectForKey:NSKeyValueChangeNewKey];
 		
@@ -128,14 +128,13 @@ static NSString * const kObservingContextSubmodules = @"submodulesChanged";
 		for (PBGitStash *stash in newStashes) {
 			PBGitMenuItem *item = [[PBGitMenuItem alloc] initWithSourceObject:stash];
 			[stashes addChild:item];
-			[item release];
 			lastItem = item;
 		}
 		if (lastItem) {
 			[sourceView PBExpandItem:lastItem expandParents:YES];
 		}
 		[sourceView reloadData];
-	} else if ([kObservingContextSubmodules isEqualToString:context]) {
+	} else if ([kObservingContextSubmodules isEqualToString:(__bridge NSString *)context]) {
 		[submodules.children removeAllObjects];
 		NSArray *newSubmodules = [change objectForKey:NSKeyValueChangeNewKey];
 		
@@ -155,7 +154,7 @@ static NSString * const kObservingContextSubmodules = @"submodulesChanged";
 			[sourceView PBExpandItem:item expandParents:YES];
 		}
 		[sourceView reloadData];
-	}else if ([@"updateRefs" isEqualToString:context]) {
+	}else if ([@"updateRefs" isEqualToString:(__bridge NSString *)context]) {
 		for(PBGitSVRemoteItem* remote in [remotes children]){
 			[self performSelectorInBackground:@selector(evaluateRemoteBadge:) withObject:remote];
 		}
@@ -514,7 +513,6 @@ static NSString * const kObservingContextSubmodules = @"submodulesChanged";
 		for (PBCommand *command in commands) {
 			PBCommandMenuItem *item = [[PBCommandMenuItem alloc] initWithCommand:command];
 			[menu addItem:item];
-			[item release];
 		}
 		return menu;
 	}
@@ -577,7 +575,7 @@ enum  {
 	NSInteger selectedSegment = [sender selectedSegment];
 	
 	if (selectedSegment == kAddRemoteSegment) {
-		[PBAddRemoteSheet beginAddRemoteSheetForRepository:repository];
+		[PBAddRemoteSheet beginAddRemoteSheetForRepository:repository withRemoteURL:Nil];
 		return;
 	}
 	

@@ -14,7 +14,7 @@
 
 @interface PBAddRemoteSheet ()
 
-- (void) beginAddRemoteSheetForRepository:(PBGitRepository *)repo;
+- (void) beginAddRemoteSheetForRepository:(PBGitRepository *)repo withRemoteURL:(NSString*)url;
 - (void) openAddRemoteSheet;
 
 @end
@@ -32,21 +32,24 @@
 @synthesize browseSheet;
 @synthesize browseAccessoryView;
 
-
+static PBAddRemoteSheet *sheet;
 
 #pragma mark -
 #pragma mark PBAddRemoteSheet
 
-+ (void) beginAddRemoteSheetForRepository:(PBGitRepository *)repo
++ (void) beginAddRemoteSheetForRepository:(PBGitRepository *)repo withRemoteURL:(NSString*)url;
 {
-	PBAddRemoteSheet *sheet = [[self alloc] initWithWindowNibName:@"PBAddRemoteSheet"];
-	[sheet beginAddRemoteSheetForRepository:repo];
+    if(!sheet){
+        sheet = [[self alloc] initWithWindowNibName:@"PBAddRemoteSheet"];
+    }
+	[sheet beginAddRemoteSheetForRepository:repo withRemoteURL:url];
 }
 
 
-- (void) beginAddRemoteSheetForRepository:(PBGitRepository *)repo
+- (void) beginAddRemoteSheetForRepository:(PBGitRepository *)repo withRemoteURL:(NSString*)url
 {
 	self.repository = repo;
+    remoteUrl = url;
 
 	[self window];
 	[self openAddRemoteSheet];
@@ -56,21 +59,15 @@
 - (void) openAddRemoteSheet
 {
 	[self.errorMessage setStringValue:@""];
+    
+    if (remoteUrl)
+    {
+        [remoteURL setStringValue:remoteUrl];
+        [remoteURL setEnabled:NO]; 
+    }
 
 	[NSApp beginSheet:[self window] modalForWindow:[self.repository.windowController window] modalDelegate:self didEndSelector:nil contextInfo:NULL];
 }
-
-
-- (void) browseSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)code contextInfo:(void *)info
-{
-    [sheet orderOut:self];
-
-    if (code == NSOKButton)
-		[self.remoteURL setStringValue:[(NSOpenPanel *)sheet filename]];
-
-	[self openAddRemoteSheet];
-}
-
 
 
 #pragma mark IBActions
@@ -89,11 +86,20 @@
     [browseSheet setCanCreateDirectories:NO];
 	[browseSheet setAccessoryView:browseAccessoryView];
 
-    [browseSheet beginSheetForDirectory:nil file:nil types:nil
-						 modalForWindow:[self.repository.windowController window]
-						  modalDelegate:self
-						 didEndSelector:@selector(browseSheetDidEnd:returnCode:contextInfo:)
-							contextInfo:NULL];
+    [browseSheet beginSheetModalForWindow:[self.repository.windowController window]
+                         completionHandler:
+     ^(NSInteger result) 
+     {
+         [browseSheet orderOut:self];
+         
+         if (result == NSFileHandlingPanelOKButton) 
+         {
+             [self.remoteURL setStringValue:[[browseSheet URL] path]];      
+         }
+         
+        [self openAddRemoteSheet];
+     }
+     ];
 }
 
 
@@ -101,7 +107,7 @@
 {
 	[self.errorMessage setStringValue:@""];
 
-	NSString *name = [[self.remoteName stringValue] copy];
+	NSString *name = [self.remoteName stringValue];
 
 	if ([name isEqualToString:@""]) {
 		[self.errorMessage setStringValue:@"Remote name is required"];
@@ -113,7 +119,7 @@
 		return;
 	}
 
-	NSString *url = [[self.remoteURL stringValue] copy];
+	NSString *url = [self.remoteURL stringValue];
 	if ([url isEqualToString:@""]) {
 		[self.errorMessage setStringValue:@"Remote URL is required"];
 		return;
@@ -133,9 +139,7 @@
 
 - (IBAction) showHideHiddenFiles:(id)sender
 {
-	// This uses undocumented OpenPanel features to show hidden files (required for 10.5 support)
-	NSNumber *showHidden = [NSNumber numberWithBool:[sender state] == NSOnState];
-	[[self.browseSheet valueForKey:@"_navView"] setValue:showHidden forKey:@"showsHiddenFiles"];
+    [self.browseSheet setShowsHiddenFiles:[sender state]];
 }
 
 

@@ -15,9 +15,9 @@
 	NSString *parameterName;
 	NSString *parameterDisplayName;
 }
-@property (nonatomic, retain, readonly) PBCommand *command;
-@property (nonatomic, retain, readonly) NSString *parameterName;
-@property (nonatomic, retain, readonly) NSString *parameterDisplayName;
+@property (nonatomic, strong, readonly) PBCommand *command;
+@property (nonatomic, strong, readonly) NSString *parameterName;
+@property (nonatomic, strong, readonly) NSString *parameterDisplayName;
 
 - initWithCommand:(PBCommand *) command parameterName:(NSString *) param parameterDisplayName:(NSString *) paramDisplayName;
 @end

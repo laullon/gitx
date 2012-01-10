@@ -150,4 +150,28 @@ NSString * const kGitXRemoteRefPrefix = @"refs/remotes/";
 	return nil;
 }
 
+-(NSString *)description
+{
+    NSMutableString *str = [NSMutableString new];
+    
+    [str appendString:@"-super description-\n"];
+    [str appendString:[super description]];
+    [str appendString:@"\n\n-PBGitRef description-\n"];
+    [str appendString:[NSString stringWithFormat:@"refishName: %@\n",[self refishName]]];
+    [str appendString:[NSString stringWithFormat:@"shortName: %@\n",[self shortName]]];
+    [str appendString:[NSString stringWithFormat:@"refishType: %@\n",[self refishType]]];
+    [str appendString:[NSString stringWithFormat:@"isTag: %@\n",[self isTag]? @"YES":@"NO"]];
+    [str appendString:[NSString stringWithFormat:@"tagName: %@\n",[self tagName]]];
+    [str appendString:[NSString stringWithFormat:@"isBranch: %@\n",[self isBranch]? @"YES":@"NO"]];
+    [str appendString:[NSString stringWithFormat:@"branchName: %@\n",[self branchName]]];
+    [str appendString:[NSString stringWithFormat:@"isRemote: %@\n",[self isRemote]? @"YES":@"NO"]];
+    [str appendString:[NSString stringWithFormat:@"remoteName: %@\n",[self remoteName]]];
+    [str appendString:[NSString stringWithFormat:@"isRemoteBranch: %@\n",[self isRemoteBranch]? @"YES":@"NO"]];   
+    [str appendString:[NSString stringWithFormat:@"remoteBranchName: %@\n",[self remoteBranchName]]];
+    [str appendString:[NSString stringWithFormat:@"type: %@\n",[self type]]];
+    [str appendString:[NSString stringWithFormat:@"remoteRef: %p\n",[self remoteRef]]];
+
+    return str;
+}
+
 @end

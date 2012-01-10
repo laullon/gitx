@@ -9,7 +9,6 @@
 #import "PBRefMenuItem.h"
 
 #import "PBStashCommandFactory.h"
-#import "PBCommandMenuItem.h"
 
 
 @implementation PBRefMenuItem
@@ -141,11 +140,23 @@
 	NSString *deleteTitle = [NSString stringWithFormat:@"Delete %@…", targetRefName];
 	[items addObject:[PBRefMenuItem itemWithTitle:deleteTitle action:@selector(showDeleteRefSheet:) enabled:!isDetachedHead]];
 	
+    // rename ref
+	NSString *renameTitle = [NSString stringWithFormat:@"Rename %@…", targetRefName];
+	[items addObject:[PBRefMenuItem itemWithTitle:renameTitle action:@selector(showRenameSheet:) enabled:!isDetachedHead]];
+    
+    if (isRemote)
+    {
+        // change Remote Url
+        [items addObject:[PBRefMenuItem separatorItem]];
+        NSString *changeRemoteUrlTitle = [NSString stringWithFormat:@"Change Remote-URL from %@…", targetRefName];
+        [items addObject:[PBRefMenuItem itemWithTitle:changeRemoteUrlTitle action:@selector(showChangeRemoteUrlSheet:) enabled:YES]];
+    }
+    
 	for (PBRefMenuItem *item in items) {
 		[item setTarget:target];
 		[item setRefish:ref];
 	}
-
+    
 	return items;
 }
 

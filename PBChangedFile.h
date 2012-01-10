@@ -16,18 +16,7 @@ typedef enum {
 	ADDED
 } PBChangedFileStatus;
 
-@interface PBChangedFile : NSObject {
-	NSString *path;
-	BOOL hasStagedChanges;
-	BOOL hasUnstagedChanges;
-
-	// Index and HEAD stuff, to be used to revert changes
-	NSString *commitBlobSHA;
-	NSString *commitBlobMode;
-
-	PBChangedFileStatus status;
-}
-
+@interface PBChangedFile : NSObject 
 
 @property (copy) NSString *path, *commitBlobSHA, *commitBlobMode;
 @property (assign) PBChangedFileStatus status;

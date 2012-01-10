@@ -14,22 +14,23 @@
 #import "PBGitDefaults.h"
 #import "PBDiffWindowController.h"
 #import "PBGitResetController.h"
-
+#import "PBRenameSheet.h"
 #import "PBArgumentPickerController.h"
+#import "PBChangeRemoteUrlSheet.h"
 
 #define kDialogAcceptDroppedRef @"Accept Dropped Ref"
 #define kDialogConfirmPush @"Confirm Push"
 #define kDialogDeleteRef @"Delete Ref"
-
-
+#define kDialogRenameRef @"Rename Ref"
+#define kDialogDeleteRemoteBranch @"Delete Remote Branch"
+#define kDialogDeleteRemoteTag @"Delete Remote Tag"
 
 @implementation PBRefController
 
 -(void)dealloc
 {
-    [dropInfo release];
-    
-    [super dealloc];
+    actDropInfo = Nil;
+    actRef = Nil;
 }
 
 - (void)awakeFromNib
@@ -64,7 +65,7 @@
 - (void)showConfirmPushRefSheet:(PBGitRef *)ref remote:(PBGitRef *)remoteRef
 {
 	if ((!ref && !remoteRef)
-		|| (ref && ![ref isBranch] && ![ref isRemoteBranch])
+		|| (ref && ![ref isTag] && ![ref isBranch] && ![ref isRemoteBranch])
 		|| (remoteRef && !([remoteRef refishType] == kGitXRemoteType)))
 		return;
 
@@ -240,15 +241,39 @@
 	if ([[sender refish] refishType] != kGitXTagType)
 		return;
 
-	NSString *tagName = [(PBGitRef *)[sender refish] tagName];
-
+    PBGitRef *ref = (PBGitRef*)[sender refish]; 
+    NSMutableString *info = [NSMutableString new];
+    
+    NSArray *remotes = [historyController.repository remotes];
+    if (remotes)
+    {
+        for (int i=0; i<[remotes count]; i++)
+        {
+            if ([historyController.repository isRemoteConnected:[remotes objectAtIndex:i]])
+            {
+                [info appendFormat:@"On remote %@:\n%@\n\n",[remotes objectAtIndex:i],[historyController.repository tagExistsOnRemote:ref remoteName:[remotes objectAtIndex:i]]?@"Yes":@"No"];
+            }
+            else
+            {
+                [info appendFormat:@"Remote %@ is not connected!\nCan't check, if tag %@ exists.\n\n",[remotes objectAtIndex:i],[ref tagName]];
+            }
+        }
+    }
+    
 	int retValue = 1;
-	NSArray *args = [NSArray arrayWithObjects:@"tag", @"-n50", @"-l", tagName, nil];
-	NSString *info = [historyController.repository outputInWorkdirForArguments:args retValue:&retValue];
-	if (!retValue) {
-		NSString *message = [NSString stringWithFormat:@"Info for tag: %@", tagName];
-		[historyController.repository.windowController showMessageSheet:message infoText:info];
+	NSArray *args = [NSArray arrayWithObjects:@"tag", @"-n50", @"-l", [ref tagName], nil];
+	NSString *output = [historyController.repository outputInWorkdirForArguments:args retValue:&retValue];    
+	if (!retValue) 
+    {
+        [info appendFormat:@"Annotation or Commitmessage:\n%@",output];
 	}
+    else
+    {
+        [info appendFormat:@"Error:\ngit tag -n50 -l %@\n\n%@",[ref tagName],output];
+	}
+
+    NSString *message = [NSString stringWithFormat:@"Info for tag: %@", [ref tagName]];
+    [historyController.repository.windowController showMessageSheet:message infoText:info];
 }
 
 
@@ -278,7 +303,25 @@
 	[alert beginSheetModalForWindow:[historyController.repository.windowController window]
 					  modalDelegate:self
 					 didEndSelector:@selector(deleteRefSheetDidEnd:returnCode:contextInfo:)
-						contextInfo:ref];
+						contextInfo:Nil];
+    actRef = ref;
+}
+
+
+- (void)showRenameSheet:(PBRefMenuItem *)sender
+{
+	if ([[sender refish] refishType] == kGitXCommitType)
+		return;
+    
+	PBGitRef *ref = (PBGitRef *)[sender refish];
+
+    [PBRenameSheet showRenameSheetAtRef:ref inRepository:historyController.repository];
+}
+
+
+- (void)showChangeRemoteUrlSheet:(PBRefMenuItem *)sender
+{
+    [PBChangeRemoteUrlSheet showChangeRemoteUrlSheetAtRefish:(PBGitRef *)[sender refish] inRepository:historyController.repository];
 }
 
 - (void)deleteRefSheetDidEnd:(NSAlert *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
@@ -289,11 +332,9 @@
         [PBGitDefaults suppressDialogWarningForDialog:kDialogDeleteRef];
 
 	if (returnCode == NSAlertDefaultReturn) {
-		PBGitRef *ref = (PBGitRef *)contextInfo;
-		[historyController.repository deleteRef:ref];
+		[historyController.repository deleteRef:actRef];
 	}
 }
-
 
 
 #pragma mark Contextual menus
@@ -366,7 +407,7 @@
 	return NSDragOperationNone;
 }
 
-- (void) dropRef
+- (void) dropRef:(NSDictionary*)dropInfo
 {
 	PBGitRef *ref = [dropInfo objectForKey:@"dragRef"];
 	PBGitCommit *oldCommit = [dropInfo objectForKey:@"oldCommit"];
@@ -408,14 +449,14 @@
 
 	PBGitCommit *dropCommit = [[commitController arrangedObjects] objectAtIndex:row];
 
-	dropInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                ref, @"dragRef",
-                oldCommit, @"oldCommit",
-                dropCommit, @"dropCommit",
-                nil];
+	NSDictionary *dropInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                              ref, @"dragRef",
+                              oldCommit, @"oldCommit",
+                              dropCommit, @"dropCommit",
+                              nil];
 
 	if ([PBGitDefaults isDialogWarningSuppressedForDialog:kDialogAcceptDroppedRef]) {
-		[self dropRef];
+		[self dropRef:dropInfo];
 		return YES;
 	}
 
@@ -435,6 +476,7 @@
 					  modalDelegate:self
 					 didEndSelector:@selector(acceptDropInfoAlertDidEnd:returnCode:contextInfo:)
 						contextInfo:Nil];
+    actDropInfo = dropInfo;
 
 	return YES;
 }
@@ -444,7 +486,7 @@
     [[alert window] orderOut:nil];
 
 	if (returnCode == NSAlertDefaultReturn)
-		[self dropRef];
+		[self dropRef:actDropInfo];
 
 	if ([[alert suppressionButton] state] == NSOnState)
         [PBGitDefaults suppressDialogWarningForDialog:kDialogAcceptDroppedRef];

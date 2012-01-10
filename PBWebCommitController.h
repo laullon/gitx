@@ -18,7 +18,7 @@
 	IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
 	
 	NSString* currentSha;
-	NSString* diff;
+	NSString*  diff;
 	BOOL showLongDiffs;
 }
 

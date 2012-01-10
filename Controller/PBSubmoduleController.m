@@ -10,26 +10,15 @@
 #import "PBGitRepository.h"
 #import "PBOpenDocumentCommand.h"
 
-@interface PBSubmoduleController()
-@property (nonatomic, retain) NSArray *submodules;
-@end
-
-
 @implementation PBSubmoduleController
-@synthesize submodules;
 
 - (id) initWithRepository:(PBGitRepository *) repo {
     if ((self = [super init])){
-        repository = [repo retain];
+        repository = repo;
     }
     return self;
 }
 
-- (void)dealloc {
-    [repository release];
-    [submodules release];
-    [super dealloc];
-}
 
 - (void) reload {
 	NSArray *arguments = [NSArray arrayWithObjects:@"submodule", @"status", @"--recursive", nil];
@@ -61,7 +50,7 @@
 	}
 	
 	
-	self.submodules = loadedSubmodules;
+	submodules = loadedSubmodules;
 }
 
 #pragma mark -
@@ -77,7 +66,6 @@
 	initializeSubmodules.commandTitle = initializeSubmodules.displayName;
 	initializeSubmodules.commandDescription = @"Initializing submodules";
 	[initializeSubmodules invoke];
-	[initializeSubmodules release];
 }
 
 - (void) updateAllSubmodules {
@@ -86,7 +74,6 @@
 	initializeSubmodules.commandTitle = initializeSubmodules.displayName;
 	initializeSubmodules.commandDescription = @"Updating submodules";
 	[initializeSubmodules invoke];
-	[initializeSubmodules release];
 }
 
 - (NSArray *) menuItems {
@@ -116,7 +103,7 @@
 	PBOpenDocumentCommand *command = [[PBOpenDocumentCommand alloc] initWithDocumentAbsolutePath:path];
 	command.commandTitle = command.displayName;
 	command.commandDescription = @"Opening document";
-	return [command autorelease];
+	return command;
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem *)menuItem {
@@ -126,7 +113,7 @@
 		shouldBeEnabled = NO;
 		//TODO implementation missing
 	} else {
-		shouldBeEnabled = [self.submodules count] > 0;
+		shouldBeEnabled = [submodules count] > 0;
 	}
 	return shouldBeEnabled;
 }

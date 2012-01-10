@@ -21,13 +21,14 @@
 	NSThread *parseThread;
 	BOOL isParsing;
 	BOOL resetCommits;
+    BOOL reloadAll;
 }
 
 - (id) initWithRepository:(PBGitRepository *)repo rev:(PBGitRevSpecifier *)rev shouldGraph:(BOOL)graph;
-- (void) loadRevisons;
+- (void)loadRevisons:(BOOL)all;
 - (void)cancel;
 
-@property (retain) NSMutableArray *commits;
+@property (strong) NSMutableArray *commits;
 @property (readonly) BOOL isParsing;
 
 @end

@@ -10,6 +10,7 @@
 #import "PBGitRefish.h"
 #import "PBCommand.h"
 #import "PBGitRepository.h"
+#import "PBGitWindowController.h"
 
 static const char* StringFromResetType(PBResetType type) {
     static const char* resetTypes[] = {
@@ -19,6 +20,8 @@ static const char* StringFromResetType(PBResetType type) {
 }
 
 @implementation PBResetSheet
+
+static PBResetSheet* sheet;
 
 - (void) beginResetSheetForRepository:(PBGitRepository*) repo refish:(id<PBGitRefish>)refish andType:(PBResetType)type {
     defaultType = type;
@@ -32,7 +35,9 @@ static const char* StringFromResetType(PBResetType type) {
 }
 
 + (void) beginResetSheetForRepository:(PBGitRepository*) repo refish:(id<PBGitRefish>)refish andType:(PBResetType)type {
-    PBResetSheet* sheet = [[self alloc] initWithWindowNibName: @"PBResetSheet"];
+    if (!sheet) {
+        sheet = [[self alloc] initWithWindowNibName: @"PBResetSheet"];
+    }
     [sheet beginResetSheetForRepository: repo refish: refish andType: type];
 }
 

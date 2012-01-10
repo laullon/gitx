@@ -15,6 +15,9 @@
 
 - (id) initWithBaseCommits:(NSSet *)commits viewAllBranches:(BOOL)viewAll queue:(NSOperationQueue *)queue delegate:(id)theDelegate
 {
+	if (!(self = [super init]))
+		return nil;
+
 	delegate = theDelegate;
 	currentQueue = queue;
 	searchSHAs = [NSMutableSet setWithSet:commits];

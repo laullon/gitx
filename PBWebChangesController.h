@@ -21,6 +21,7 @@
 
 	PBChangedFile *selectedFile;
 	BOOL selectedFileIsCached;
+    NSString *actHunk;
 }
 
 - (void) refresh;

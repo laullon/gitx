@@ -10,6 +10,8 @@
 #import "PBGitCommit.h"
 #import "PBGitDefaults.h"
 #import "PBGitStash.h"
+#import "PBWebHistoryController.h"
+#import "PBWebStashController.h"
 
 const CGFloat kMinPaneSize = 32.0;
 

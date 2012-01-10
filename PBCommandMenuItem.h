@@ -9,10 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "PBCommand.h"
 
-@interface PBCommandMenuItem : NSMenuItem {
-	PBCommand *command;
-}
-@property (nonatomic, retain, readonly) PBCommand *command;
+@interface PBCommandMenuItem : NSMenuItem {}
 
 - initWithCommand:(PBCommand *) aCommand;
 

@@ -38,15 +38,15 @@ typedef enum historySearchModes {
 	NSPanel *rewindPanel;
 }
 
-@property (assign) IBOutlet PBGitHistoryController *historyController;
-@property (assign) IBOutlet NSArrayController *commitController;
+@property (strong) IBOutlet PBGitHistoryController *historyController;
+@property (strong) IBOutlet NSArrayController *commitController;
 
-@property (assign) IBOutlet NSSearchField *searchField;
-@property (assign) IBOutlet NSSegmentedControl *stepper;
-@property (assign) IBOutlet NSTextField *numberOfMatchesField;
-@property (assign) IBOutlet NSProgressIndicator *progressIndicator;
+@property (strong) IBOutlet NSSearchField *searchField;
+@property (strong) IBOutlet NSSegmentedControl *stepper;
+@property (strong) IBOutlet NSTextField *numberOfMatchesField;
+@property (strong) IBOutlet NSProgressIndicator *progressIndicator;
 
-@property (assign) PBHistorySearchMode searchMode;
+@property (nonatomic,assign) PBHistorySearchMode searchMode;
 
 
 - (BOOL)isRowInSearchResults:(NSInteger)rowIndex;
@@ -62,5 +62,7 @@ typedef enum historySearchModes {
 - (IBAction)updateSearch:(id)sender;
 
 - (void)setHistorySearch:(NSString *)searchString mode:(NSInteger)mode;
+
+- (void)setSearchMode:(PBHistorySearchMode)mode;
 
 @end

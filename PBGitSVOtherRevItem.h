@@ -14,7 +14,7 @@
     NSString* helpText;
 }
 
-@property(retain) NSString* helpText;
+@property(strong) NSString* helpText;
 
 + (id)otherItemWithRevSpec:(PBGitRevSpecifier *)revSpecifier;
 

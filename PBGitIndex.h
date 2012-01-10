@@ -55,7 +55,7 @@ extern NSString *PBGitIndexOperationFailed;
 
 // Whether we want the changes for amending,
 // or for
-@property BOOL amend;
+@property (nonatomic) BOOL amend;
 
 - (id)initWithRepository:(PBGitRepository *)repository workingDirectory:(NSURL *)workingDirectory;
 
@@ -67,6 +67,7 @@ extern NSString *PBGitIndexOperationFailed;
 // Refresh the index
 - (void)refresh;
 
+- (void)commitMergeWithMessage:(NSString *)commitMessage;
 - (void)commitWithMessage:(NSString *)commitMessage andVerify:(BOOL) doVerify;
 
 // Inter-file changes:

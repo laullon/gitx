@@ -47,7 +47,8 @@
 	NSPoint center = NSMakePoint( origin.x + columnWidth * to, origin.y + r.size.height * 0.5 + 0.5);
 
 	NSArray* colors = [PBGitRevisionCell laneColors];
-	[[colors objectAtIndex: c % [colors count]] set];
+    NSColor *color = [colors objectAtIndex: c % [colors count]];
+	[color set];
 	
 	NSBezierPath * path = [NSBezierPath bezierPath];
 	[path setLineWidth:2];
@@ -130,8 +131,8 @@
 
 - (NSMutableDictionary*) attributesForRefLabelSelected: (BOOL) selected
 {
-	NSMutableDictionary *attributes = [[[NSMutableDictionary alloc] initWithCapacity:2] autorelease];
-	NSMutableParagraphStyle* style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+	NSMutableDictionary *attributes = [[NSMutableDictionary alloc] initWithCapacity:2];
+	NSMutableParagraphStyle* style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 	
 	[style setAlignment:NSCenterTextAlignment];
 	[attributes setObject:style forKey:NSParagraphStyleAttributeName];

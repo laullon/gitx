@@ -19,15 +19,11 @@
 - initWithSourceObject:(id<PBPresentable>) anObject {
 	if ((self = [super init])) {
 		super.title = [anObject displayDescription];
-		sourceObject = [anObject retain];
+		sourceObject = anObject;
 	}
 	return self;
 }
 
-- (void) dealloc {
-	[sourceObject release];
-	[super dealloc];
-}
 
 //---------------------------------------------------------------------------------------------
 #pragma mark -

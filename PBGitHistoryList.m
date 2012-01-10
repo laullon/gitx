@@ -31,7 +31,7 @@
 
 @implementation PBGitHistoryList
 
-
+@synthesize reloadAll;
 @synthesize projectRevList;
 @synthesize commits;
 @synthesize isUpdating;
@@ -44,6 +44,9 @@
 
 - (id) initWithRepository:(PBGitRepository *)repo
 {
+	if (!(self = [super init]))
+		return nil;
+
 	commits = [NSMutableArray array];
 	repository = repo;
 	lastBranchFilter = -1;
@@ -316,7 +319,7 @@
 		lastRemoteRef = nil;
 		lastSHA = nil;
 		self.commits = [NSMutableArray array];
-		[projectRevList loadRevisons];
+		[projectRevList loadRevisons:reloadAll];
 		return;
 	}
 
@@ -335,7 +338,7 @@
 	lastSHA = nil;
 	self.commits = [NSMutableArray array];
 
-	[otherRevListParser loadRevisons];
+	[otherRevListParser loadRevisons:reloadAll];
 }
 
 
@@ -345,17 +348,17 @@
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if ([@"currentBranch" isEqualToString:context]) {
+	if ([@"currentBranch" isEqualToString:(__bridge NSString *)context]) {
 		[self updateHistory];
 		return;
 	}
 
-	if ([@"repositoryHasChanged" isEqualToString:context]) {
+	if ([@"repositoryHasChanged" isEqualToString:(__bridge NSString *)context]) {
 		[self forceUpdate];
 		return;
 	}
 
-	if ([@"commitsUpdated" isEqualToString:context]) {
+	if ([@"commitsUpdated" isEqualToString:(__bridge NSString *)context]) {
 		NSInteger changeKind = [(NSNumber *)[change objectForKey:NSKeyValueChangeKindKey] intValue];
 		if (changeKind == NSKeyValueChangeInsertion) {
 			NSArray *newCommits = [change objectForKey:NSKeyValueChangeNewKey];

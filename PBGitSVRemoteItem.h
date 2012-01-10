@@ -16,7 +16,7 @@
 }
 
 @property (assign) BOOL alert;
-@property (retain) NSString *helpText;
+@property (strong) NSString *helpText;
 
 + (id)remoteItemWithTitle:(NSString *)title;
 

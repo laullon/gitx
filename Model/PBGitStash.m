@@ -17,26 +17,18 @@
 
 - initWithRawStashLine:(NSString *) stashLineFromStashListOutput {
 	if ((self = [super init])) {
-		stashRawString = [stashLineFromStashListOutput retain];
+		stashRawString = stashLineFromStashListOutput;
 		NSArray *lineComponents = [stashLineFromStashListOutput componentsSeparatedByString:@":"];
 		if ([lineComponents count] != 3) {
-			[self release];
 			return nil;
 		}
-		name = [[lineComponents objectAtIndex:0] retain];
-		stashSourceMessage = [[[lineComponents objectAtIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] retain];
-		message = [[[lineComponents objectAtIndex:2] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] retain];
+		name = [lineComponents objectAtIndex:0];
+		stashSourceMessage = [[lineComponents objectAtIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		message = [[lineComponents objectAtIndex:2] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	}
 	return self;
 }
 
-- (void) dealloc {
-	[stashSourceMessage release];
-	[stashRawString release];
-	[name release];
-	[message release];
-	[super dealloc];
-}
 
 - (NSString *) description {
 	return self.stashRawString;

@@ -14,7 +14,7 @@
 	id <PBGitRefish> refish;
 }
 
-@property (retain) id <PBGitRefish> refish;
+@property (strong) id <PBGitRefish> refish;
 
 + (PBRefMenuItem *) separatorItem;
 + (NSArray *) defaultMenuItemsForRef:(PBGitRef *)ref inRepository:(PBGitRepository *)repo target:(id)target;

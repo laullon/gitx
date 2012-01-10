@@ -43,9 +43,10 @@
 - (void) updateCommitsFromGrapher:(NSDictionary *)commitData;
 
 
-@property (retain) PBGitRevList *projectRevList;
-@property (retain) NSMutableArray *commits;
+@property (strong) PBGitRevList *projectRevList;
+@property (strong) NSMutableArray *commits;
 @property (readonly) NSArray *projectCommits;
 @property (assign) BOOL isUpdating;
+@property (assign) BOOL reloadAll;
 
 @end

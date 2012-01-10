@@ -7,7 +7,6 @@
 //
 
 #import "PBViewController.h"
-#import "PBWebHistoryController.h"
 
 @class PBGitStash;
 @class PBWebStashController;

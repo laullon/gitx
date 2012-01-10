@@ -25,11 +25,11 @@ typedef enum {
 	
 	NSMutableArray *submodules;
 }
-@property (nonatomic, retain, readonly) NSMutableArray *submodules;
-@property (nonatomic, assign, readonly) PBGitSubmoduleState submoduleState;
-@property (nonatomic, retain, readonly) NSString *name;
-@property (nonatomic, retain, readonly) NSString *path;
-@property (nonatomic, retain, readonly) NSString *checkedOutCommit;
+@property (readonly) NSMutableArray *submodules;
+@property (readonly) PBGitSubmoduleState submoduleState;
+@property (readonly) NSString *name;
+@property (readonly) NSString *path;
+@property (readonly) NSString *checkedOutCommit;
 
 - (id) initWithRawSubmoduleStatusString:(NSString *) submoduleStatusString;
 

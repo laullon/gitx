@@ -8,13 +8,6 @@
 
 #import "PBGitSubmodule.h"
 
-@interface PBGitSubmodule()
-@property (nonatomic, retain) NSString *name;
-@property (nonatomic, retain) NSString *path;
-@property (nonatomic, retain) NSString *checkedOutCommit;
-@end
-
-
 @implementation PBGitSubmodule
 @synthesize name;
 @synthesize path;
@@ -53,22 +46,15 @@
 		if (shouldContinue) {
             [scanner scanUpToString:@")" intoString:&coName];
 		}
-		self.path = [fullPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		path = [fullPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		coName = [coName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		self.checkedOutCommit = [coName length] > 0 ? coName : nil;
-		self.name = [self.path lastPathComponent];
+		checkedOutCommit = [coName length] > 0 ? coName : nil;
+		name = [self.path lastPathComponent];
 		
 	}
 	return self;
 }
 
-- (void) dealloc {
-	[submodules release];
-	[name release];
-	[path release];
-	[checkedOutCommit release];
-	[super dealloc];
-}
 
 - (void) addSubmodule:(PBGitSubmodule *) submodule {
 	[self.submodules addObject:submodule];
@@ -86,7 +72,7 @@
 	if (self.checkedOutCommit) {
 		[result appendFormat:@" (%@)", self.checkedOutCommit];
 	}
-	return [result autorelease];
+	return result;
 }
 
 - (NSString *) popupDescription {

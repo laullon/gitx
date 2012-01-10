@@ -13,7 +13,6 @@
 
 - (id) initWithDocumentAbsolutePath:(NSString *) path {
 	if (!path) {
-		[self autorelease];
 		return nil;
 	}
 	

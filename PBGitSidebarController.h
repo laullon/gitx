@@ -17,7 +17,6 @@
 @interface PBGitSidebarController : PBViewController PROTOCOL_10_6(NSOutlineViewDelegate, NSMenuDelegate){
 	IBOutlet NSWindow *window;
 	IBOutlet NSOutlineView *sourceView;
-	IBOutlet NSView *sourceListControlsView;
 	IBOutlet NSPopUpButton *actionButton;
 	IBOutlet NSSegmentedControl *remoteControls;
 
@@ -25,8 +24,6 @@
 	IBOutlet NSButton* svnRebaseButton;
 	IBOutlet NSButton* svnDcommitButton;
     
-	NSMutableArray *items;
-
 	/* Specific things */
 	PBSourceViewItem *stage;
 
@@ -52,10 +49,10 @@
 -(NSNumber *)countCommintsOf:(NSString *)range;
 -(bool)remoteNeedFetch:(NSString *)remote;
 
-@property(readonly) NSMutableArray *items;
-@property(readonly) NSView *sourceListControlsView;
-@property(readonly) PBGitHistoryController *historyViewController;
-@property(readonly) PBGitCommitController *commitViewController;
-@property(readonly) PBStashContentController *stashViewController;
+@property(strong, readonly) NSMutableArray *items;
+@property(strong, readonly) NSView *sourceListControlsView;
+@property(strong, readonly) PBGitHistoryController *historyViewController;
+@property(strong, readonly) PBGitCommitController *commitViewController;
+@property(strong, readonly) PBStashContentController *stashViewController;
 
 @end

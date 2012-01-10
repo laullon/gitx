@@ -13,6 +13,7 @@
 #import "PBGitHistoryController.h"
 #import "PBRefContextDelegate.h"
 #import "SearchWebView.h"
+#import "MGScopeBar.h"
 
 @class PBGitGradientBarView;
 
@@ -49,7 +50,7 @@
 
 -(IBAction)updateSearch:(NSSearchField *)sender;
   
-@property(retain) NSMutableArray *groups;
-@property(retain) NSString *logFormat;
+@property(strong) NSMutableArray *groups;
+@property(strong) NSString *logFormat;
 
 @end

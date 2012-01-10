@@ -17,7 +17,7 @@
 
 - (id) initWithRepository:(PBGitRepository *) repo {
 	if ((self = [super init])){
-        repository = [repo retain];
+        repository = repo;
     }
     return self;
 }
@@ -54,9 +54,5 @@
 	return shouldBeEnabled;
 }
 
-- (void) dealloc {
-	[repository release];
-	[super dealloc];
-}
 
 @end

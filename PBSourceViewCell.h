@@ -19,6 +19,6 @@
 }
 @property (nonatomic) BOOL showsActionButton;
 @property (nonatomic) SEL iInfoButtonAction;
-@property (assign) NSString *badge;
+@property (strong) NSString *badge;
 
 @end

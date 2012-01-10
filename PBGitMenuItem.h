@@ -14,7 +14,7 @@
 @interface PBGitMenuItem : PBSourceViewItem {
 	id<PBPresentable> sourceObject;
 }
-@property (nonatomic, retain, readonly) id<PBPresentable> sourceObject;
+@property (nonatomic, strong, readonly) id<PBPresentable> sourceObject;
 
 - initWithSourceObject:(id<PBPresentable>) anObject;
 @end

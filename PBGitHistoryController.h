@@ -11,7 +11,6 @@
 #import "PBGitTree.h"
 #import "PBViewController.h"
 
-@class PBGitSidebarController;
 @class PBWebHistoryController;
 @class PBGitGradientBarView;
 @class PBRefController;
@@ -26,12 +25,12 @@
 @interface PBGitHistoryController : PBViewController PROTOCOL_10_6(NSOutlineViewDelegate){
 	IBOutlet PBRefController *refController;
 	IBOutlet NSSearchField *searchField;
-	IBOutlet NSArrayController* commitController;
+	IBOutlet NSArrayController*  commitController;
 	IBOutlet NSSearchField *filesSearchField;
-	IBOutlet NSTreeController* treeController;
+	IBOutlet NSTreeController*  treeController;
 	IBOutlet NSOutlineView* fileBrowser;
 	NSArray *currentFileBrowserSelectionPath;
-	IBOutlet PBCommitList* commitList;
+	IBOutlet PBCommitList*  commitList;
 	IBOutlet NSSplitView *historySplitView;
 	IBOutlet PBWebHistoryController *webHistoryController;
 	QLPreviewPanel* previewPanel;
@@ -60,9 +59,9 @@
 
 @property (readonly) NSTreeController* treeController;
 @property (readonly) NSSplitView *historySplitView;
-@property (assign) int selectedCommitDetailsIndex;
-@property (retain) PBGitCommit *webCommit;
-@property (retain) PBGitTree* gitTree;
+@property (nonatomic,assign) int selectedCommitDetailsIndex;
+@property (strong) PBGitCommit *webCommit;
+@property (strong) PBGitTree* gitTree;
 @property (readonly) NSArrayController *commitController;
 @property (readonly) PBRefController *refController;
 @property (readonly) PBHistorySearchController *searchController;
@@ -108,4 +107,5 @@
 - (BOOL)splitView:(NSSplitView *)sender canCollapseSubview:(NSView *)subview;
 - (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex;
 
+- (IBAction)loadAllCommits:(id)sender;
 @end

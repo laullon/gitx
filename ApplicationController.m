@@ -18,6 +18,12 @@
 #import "PBCloneRepositoryPanel.h"
 #import "Sparkle/SUUpdater.h"
 #import "AIURLAdditions.h"
+#import "PBGitRepository.h"
+
+@interface ApplicationController ()
+- (void) cleanUpRemotesOnError;
+@end
+
 
 @implementation ApplicationController
 
@@ -72,7 +78,10 @@
  
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
 {
-	[[SUUpdater sharedUpdater] setSendsSystemProfile:YES];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getArguments:) name:@"GitCommandSent" object:Nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cleanGitAfterErrorMessage:) name:@"ErrorMessageDidEnd" object:Nil];
+     
+    [[SUUpdater sharedUpdater] setSendsSystemProfile:YES];
     [[SUUpdater sharedUpdater] setDelegate:self];
 
     if ([PBGitDefaults useAskPasswd]) {
@@ -245,7 +254,7 @@
         return managedObjectModel;
     }
 	
-    managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:nil] retain];    
+    managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:nil];    
     return managedObjectModel;
 }
 
@@ -392,6 +401,8 @@
 			[PBGitDefaults setPreviousDocumentPaths:paths];
 		}
 	}
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 /**
@@ -400,10 +411,9 @@
  
 - (void) dealloc {
 
-    [managedObjectContext release], managedObjectContext = nil;
-    [persistentStoreCoordinator release], persistentStoreCoordinator = nil;
-    [managedObjectModel release], managedObjectModel = nil;
-    [super dealloc];
+    managedObjectContext = nil;
+    persistentStoreCoordinator = nil;
+    managedObjectModel = nil;
 }
 
 
@@ -444,5 +454,35 @@
 }
 
 
+#pragma mark - Observer methods
+
+- (void)getArguments:(NSNotification*)notification
+{
+    notificationUserInfo = [notification userInfo];
+}
+
+
+- (void)cleanGitAfterErrorMessage:(NSNotification*)notification
+{
+    // When adding a remote occurs an error the remote
+    // will be set on git and has to be removed to clean the remotes list
+    [self cleanUpRemotesOnError];
+    
+    
+    
+}
+
+#pragma mark - Extensions
+- (void) cleanUpRemotesOnError
+{    
+    // check, if arguments was to add a remote
+    if ( ([(NSString*)[notificationUserInfo valueForKey:@"Arg0"] compare:@"remote"] == NSOrderedSame) &&
+        ([(NSString*)[notificationUserInfo valueForKey:@"Arg1"] compare:@"add"] == NSOrderedSame)
+        )
+    {
+        PBGitRef *remoteRef = [PBGitRef refFromString:[NSString stringWithFormat:@"%@%@", kGitXRemoteRefPrefix,[notificationUserInfo valueForKey:@"Arg3"]]];
+        [[notificationUserInfo valueForKey:@"Repository"] deleteRemote:remoteRef];
+    }
+}
 
 @end

@@ -10,13 +10,8 @@
 #import <PBGitRef.h>
 
 @interface PBGitRevSpecifier : NSObject  <NSCopying> {
-	NSString *description;
-	NSString *helpText;
 	NSArray *parameters;
-	NSURL *workingDirectory;
 	BOOL isSimpleRef;
-	NSNumber *behind;
-	NSNumber *ahead;
 }
 
 - (id) initWithParameters:(NSArray *)params description:(NSString *)descrip;
@@ -36,12 +31,12 @@
 + (PBGitRevSpecifier *)allBranchesRevSpec;
 + (PBGitRevSpecifier *)localBranchesRevSpec;
 
-@property(retain)   NSString *description;
-@property(retain)   NSString *helpText;
+@property(nonatomic,strong) NSString *description;
+@property(strong) NSString *helpText;
 @property(readonly) NSArray *parameters;
-@property(retain)   NSURL *workingDirectory;
+@property(strong) NSURL *workingDirectory;
 @property(readonly) BOOL isSimpleRef;
-@property(assign) NSNumber *behind;
-@property(assign) NSNumber *ahead;
+@property(strong) NSNumber *behind;
+@property(strong) NSNumber *ahead;
 
 @end

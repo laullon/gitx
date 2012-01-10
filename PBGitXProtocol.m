@@ -13,10 +13,6 @@
 
 - (id)initWithRequest:(NSURLRequest *)request cachedResponse:(NSCachedURLResponse *)cachedResponse client:(id <NSURLProtocolClient>)client
 {
-    // work around for NSURLProtocol bug
-    // note that this leaks!
-    CFRetain(client);
-	
     if ((self = [super initWithRequest:request cachedResponse:cachedResponse client:client]))
     {
     }

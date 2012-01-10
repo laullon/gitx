@@ -13,21 +13,20 @@
 
 @interface PBCloneRepsitoryToSheet : NSWindowController {
 	PBGitRepository *repository;
-
 	BOOL isBare;
-
 	NSTextField *message;
 	NSView      *cloneToAccessoryView;
+    NSOpenPanel *cloneToSheet;
 }
 
 + (void) beginCloneRepsitoryToSheetForRepository:(PBGitRepository *)repo;
 
 
-@property (readwrite) PBGitRepository *repository;
+@property(strong) PBGitRepository *repository;
+@property BOOL isBare;
+@property(strong) IBOutlet NSTextField *message;
+@property(strong) IBOutlet NSView      *cloneToAccessoryView;
 
-@property (readwrite) BOOL isBare;
-
-@property (readwrite) IBOutlet NSTextField *message;
-@property (readwrite) IBOutlet NSView      *cloneToAccessoryView;
+- (IBAction) showHideHiddenFiles:(id)sender;
 
 @end

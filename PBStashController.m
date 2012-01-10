@@ -24,16 +24,11 @@ static NSString * const kCommandName = @"stash";
 
 - (id) initWithRepository:(PBGitRepository *) repo {
     if ((self = [super init])){
-        repository = [repo retain];
+        repository = repo;
     }
     return self;
 }
 
-- (void)dealloc {
-    [repository release];
-    [stashes release];
-    [super dealloc];
-}
 
 - (void) reload {
     NSArray *arguments = [NSArray arrayWithObjects:kCommandName, @"list", nil];
@@ -48,11 +43,9 @@ static NSString * const kCommandName = @"stash";
 		PBGitStash *stash = [[PBGitStash alloc] initWithRawStashLine:stashLine];
 		if (stash != nil)
 			[loadedStashes addObject:stash];
-		[stash release];
 	}
 	
 	self.stashes = loadedStashes;
-	[loadedStashes release];
 }
 
 #pragma mark Actions
@@ -64,10 +57,8 @@ static NSString * const kCommandName = @"stash";
 	command.commandDescription = @"Stashing local changes";
 	
 	PBCommandWithParameter *cmd = [[PBCommandWithParameter alloc] initWithCommand:command parameterName:@"save" parameterDisplayName:@"Stash message (optional)"];
-	[command release];
 	
 	[cmd invoke];
-	[cmd release];
 }
 
 - (void) clearAllStashes {
@@ -75,7 +66,6 @@ static NSString * const kCommandName = @"stash";
 	command.commandTitle = command.displayName;
 	command.commandDescription = @"Clearing stashes";
 	[command invoke];
-	[command release];
 }
 
 #pragma mark Menu

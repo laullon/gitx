@@ -31,8 +31,7 @@
 
 - (void) setFilterPredicate:(NSPredicate *) newPredicate {
 	if (newPredicate != filterPredicate) {
-		[filterPredicate release];
-		filterPredicate = [newPredicate retain];
+		filterPredicate = newPredicate;
 		
 		if (leaf) {
 			return;
@@ -379,6 +378,6 @@
 
 - (BOOL)isEqualTo:(PBGitTree *)object
 {
-    return [sha isEqualTo:[object sha]] && [[self fullPath] isEqualTo:[object fullPath]];
+    return [self.sha isEqualToString:object.sha] && [self.fullPath isEqualToString:object.fullPath];
 }
 @end

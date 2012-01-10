@@ -15,10 +15,10 @@
 
 - (id) initWithPath:(NSString *)p
 {
-	if (![super init])
+	if (!(self = [super init]))
 		return nil;
 
-	path = p;
+	self.path = p;
 	return self;
 }
 

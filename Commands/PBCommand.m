@@ -9,10 +9,6 @@
 #import "PBCommand.h"
 #import "PBRemoteProgressSheet.h"
 
-@interface PBCommand()
-@property (nonatomic, retain) PBGitRepository *repository;
-@end
-
 @implementation PBCommand
 @synthesize displayName;
 @synthesize commandDescription;
@@ -27,26 +23,14 @@
 - (id) initWithDisplayName:(NSString *) aDisplayName parameters:(NSArray *) params repository:(PBGitRepository *) repo {
 	self = [super init];
 	if (self != nil) {
-		self.displayName = aDisplayName;
+		displayName = aDisplayName;
 		parameters = [[NSMutableArray alloc] initWithArray:params];
-		
-		// default values
-		self.commandTitle = @"";
-		self.commandDescription = @"";
-		self.repository = repo;
-		self.canBeFired = YES;
+		commandTitle = @"";
+		commandDescription = @"";
+		repository = repo;
+		canBeFired = YES;
 	}
 	return self;
-}
-
-
-- (void) dealloc {
-	[repository release];
-	[commandDescription release];
-	[commandTitle release];
-	[parameters release];
-	[displayName release];
-	[super dealloc];
 }
 
 - (NSArray *) allParameters {

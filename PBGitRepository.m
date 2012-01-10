@@ -27,10 +27,8 @@
 #import "PBGitStash.h"
 #import "PBGitSubmodule.h"
 
-NSString* PBGitRepositoryErrorDomain = @"GitXErrorDomain";
 
-@interface PBGitRepository()
-@end
+NSString* PBGitRepositoryErrorDomain = @"GitXErrorDomain";
 
 dispatch_queue_t PBGetWorkQueue() {
 #if 1
@@ -168,7 +166,7 @@ dispatch_queue_t PBGetWorkQueue() {
 
 	[self setFileURL:gitDirURL];
     if (![self workingDirectory]) { // If we couldn't find the working directory, assume it's the place we were opened from.
-        workingDirectory = [[absoluteURL path] retain];
+        workingDirectory = [absoluteURL path];
     }
     
         
@@ -390,7 +388,7 @@ dispatch_queue_t PBGetWorkQueue() {
 	}
 
 	for (PBGitRevSpecifier *branch in oldBranches)
-		if ([branch isSimpleRef] && ![branch isEqual:[self headRef]])
+		if ([branch isSimpleRef] && (![branch isEqual:[self headRef]]))
 			[self removeBranch:branch];
 
 	[self willChangeValueForKey:@"refs"];
@@ -520,7 +518,7 @@ dispatch_queue_t PBGetWorkQueue() {
 
 - (BOOL)isOnSameBranch:(NSString *)branchSHA asSHA:(NSString *)testSHA
 {
-	if (!branchSHA || !testSHA)
+	if ((!branchSHA) || (!testSHA))
 		return NO;
 
 	if ([testSHA isEqual:branchSHA])
@@ -575,14 +573,287 @@ dispatch_queue_t PBGetWorkQueue() {
 	return YES;
 }
 
-- (BOOL) refExists:(PBGitRef *)ref
+- (BOOL)refExists:(PBGitRef *)ref checkOnRemotesWithoutBranches:(BOOL)remoteCheck resultMessage:(NSString**)result
 {
-	int retValue = 1;
-    NSString *output = [self outputInWorkdirForArguments:[NSArray arrayWithObjects:@"for-each-ref", [ref ref], nil] retValue:&retValue];
-    if (retValue || [output isEqualToString:@""])
+    if (!ref)
+    {
+        if (result)
+        {
+            *result = @"Ref is Nil, can't progress check existence!";
+        }
         return NO;
-    return YES;
+    }
+    
+    NSString *refShortName;
+    
+    if ([ref isTag])
+    {
+        refShortName = [ref tagName];
+    }
+    else if ([ref isBranch])
+    {
+        refShortName = [ref branchName];
+    }
+    else if ([ref isRemoteBranch])
+    {
+        refShortName = [ref remoteBranchName];
+    }
+    else if ([ref isRemote])
+    {
+        refShortName = [ref remoteName];
+    }
+    
+    NSArray *arguments;
+    NSString *output;
+    int retValue = 1;
+    
+    // Check local refs/heads/ for ref
+    arguments = [NSArray arrayWithObjects:@"for-each-ref", [NSString stringWithFormat:@"%@%@",kGitXBranchRefPrefix,refShortName], nil];
+    output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
+    if (![output isEqualToString:@""])
+    {
+        if (result)
+        {
+            *result = [NSString stringWithFormat:@"%@ exists already local as branch!",refShortName];
+        }
+        return YES;
+    }
+
+    // Check local refs/tags/ for ref
+    arguments = [NSArray arrayWithObjects:@"for-each-ref", [NSString stringWithFormat:@"%@%@",kGitXTagRefPrefix,refShortName], nil];
+    output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
+    if (![output isEqualToString:@""])
+    {
+        if (result)
+        {
+            *result = [NSString stringWithFormat:@"%@ exists already local as tag!",refShortName];
+        }
+        return YES;
+    }
+    
+    // Check if any remote exists with refShortName
+    NSArray *repoRemotes = [self remotes];
+    if ([repoRemotes containsObject:refShortName])
+    {
+        if (result)
+        {
+            *result = [NSString stringWithFormat:@"%@ exists already local as remotename!",refShortName];
+        }
+        return YES;
+    }
+
+    NSMutableString *completeResults = [NSMutableString string];
+
+    // Check Tags on any Remotes
+    if (repoRemotes && remoteCheck)
+    {
+
+        for (int i=0; i<[repoRemotes count]; i++)
+        {
+            // Check Remote connection
+            if ([self isRemoteConnected:[repoRemotes objectAtIndex:i]])
+            {
+                // Check remote refs/tags/ for ref
+                arguments = [NSArray arrayWithObjects:@"ls-remote", @"-t",[repoRemotes objectAtIndex:i] ,refShortName, nil];
+                output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
+                if (![output isEqualToString:@""])
+                {
+                    [completeResults appendFormat:@"%@ exists already as tag on remote %@!",refShortName,[repoRemotes objectAtIndex:i]];
+                    if (result)
+                    {
+                        *result = completeResults;
+                    }
+                    return YES;
+                }
+            }
+            else
+            {
+                [completeResults appendFormat:@"Remote %@ is actually not connected, can't check for existing refname there!\n",[repoRemotes objectAtIndex:i]];
+            }
+        }
+    }
+    
+    if (result)
+    {
+        if ([completeResults length])
+        {
+            *result = completeResults;
+        }
+        else
+        {
+            result = Nil;
+        }
+    }
+    return NO;
 }
+
+
+- (BOOL)refExistsOnRemote:(PBGitRef *)ref remoteName:(NSString *)remote resultMessage:(NSString**)result
+{
+    if (!remote)
+    {
+        if (result)
+        {
+            *result = @"Remotename is Nil, can't progress check existence!";
+        }
+        return NO;
+    }
+    
+    if (!ref)
+    {
+        if (result)
+        {
+            *result = [NSString stringWithFormat:@"Ref is Nil, can't progress check existence on remote %@!",remote];
+        }
+        return NO;
+    }
+    
+    NSString *refShortName;
+    
+    if ([ref isTag])
+    {
+        refShortName = [ref tagName];
+    }
+    else if ([ref isBranch])
+    {
+        refShortName = [ref branchName];
+    }
+    else if ([ref isRemoteBranch])
+    {
+        refShortName = [ref remoteBranchName];
+    }
+    
+    if (![self hasRemotes])
+    {
+        if (result)
+        {
+            *result = [NSString stringWithFormat:@"Repository has no remotes, can't progress check existence from %@ %@ on remote %@!",[ref refishType],refShortName,remote];
+        }
+        return NO;
+    }
+    
+    if (![self isRemoteConnected:remote])
+    {
+        if (result)
+        {
+            *result = [NSString stringWithFormat:@"Remote %@ is actually not connected, can't check for existing refname there!",remote];
+        }
+        return NO;
+    }
+    
+    int retValue = 1;
+    // Check remote refs/tags/ for ref
+    NSArray *arguments = [NSArray arrayWithObjects:@"ls-remote", @"-t", remote, refShortName, nil];
+    NSString *output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
+    if (![output isEqualToString:@""])
+    {
+        if (result)
+        {
+            *result = [NSString stringWithFormat:@"%@ exists as tag on remote %@!",refShortName,remote];
+        }
+        return YES;
+    }
+    
+    // Check remote refs/tags/ for ref
+    arguments = [NSArray arrayWithObjects:@"ls-remote", @"-h", remote, refShortName, nil];
+    output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
+    if (![output isEqualToString:@""])
+    {
+        if (result)
+        {
+            *result = [NSString stringWithFormat:@"%@ exists as branch on remote %@!",refShortName,remote];
+        }
+        return YES;
+    }
+
+    result = Nil;
+    return NO;
+}
+
+
+- (BOOL)refExistsOnAnyRemote:(PBGitRef*)ref resultMessage:(NSString**)result
+{
+    if (!ref)
+    {
+        if (result)
+        {
+            *result = @"Ref is Nil, can't progress check existence on any remotes!";
+        }
+        return NO;
+    }
+
+    NSMutableString *completeResults = [NSMutableString string];
+
+    if ([self hasRemotes])
+    {
+        NSArray *repoRemotes = [self remotes];
+        NSString *oneResult;
+        for (int i=0; i<[repoRemotes count]; i++)
+        {
+            if ([self refExistsOnRemote:ref remoteName:[repoRemotes objectAtIndex:i] resultMessage:&oneResult])
+            {
+                if (oneResult)
+                {
+                    [completeResults appendString:oneResult];
+                }
+                
+                if (result)
+                {
+                    *result = completeResults;
+                }
+                
+                return YES;
+            }
+            else
+            {
+                if (oneResult)
+                {
+                    [completeResults appendString:oneResult];
+                }
+            }
+        }
+    }
+    else
+    {
+        if (result)
+        {
+            *result = [NSString stringWithFormat:@"Repository has no remotes, can't progress check existence from %@ on any remotes!",[ref shortName]];
+        }
+        return NO;
+    }
+
+    if (result)
+    {
+        if ([completeResults length])
+        {
+            *result = completeResults;
+        }
+        else
+        {
+            result = Nil;
+        }
+    }
+    return NO;
+}
+
+
+- (BOOL)tagExistsOnRemote:(PBGitRef *)ref remoteName:(NSString *)remote
+{
+    if ((!ref) || (![self hasRemotes]) || (![ref isTag]))
+    {
+        return NO;
+    }
+    
+    int retValue = 1;
+    // Check remote refs/tags/ for tag
+    NSArray *arguments = [NSArray arrayWithObjects:@"ls-remote", @"-t", remote, [ref tagName], nil];
+    NSString *output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
+    if (![output isEqualToString:@""])
+        return YES;
+    
+    return NO;
+}
+
 
 // useful for getting the full ref for a user entered name
 // EX:  name: master
@@ -654,7 +925,7 @@ dispatch_queue_t PBGetWorkQueue() {
 {
 	if(!workingDirectory) {
 		if ([self.fileURL.path hasSuffix:@"/.git"])
-			workingDirectory = [[self.fileURL.path substringToIndex:[self.fileURL.path length] - 5] retain];
+			workingDirectory = [self.fileURL.path substringToIndex:[self.fileURL.path length] - 5];
 		else if ([[self outputForCommand:@"rev-parse --is-inside-work-tree"] isEqualToString:@"true"])
 			workingDirectory = [PBGitBinary path];
 	}
@@ -687,10 +958,10 @@ dispatch_queue_t PBGetWorkQueue() {
 	NSString *branchName = [branch branchName];
 	if (branchName) {
 		NSString *remoteName = [[self config] valueForKeyPath:[NSString stringWithFormat:@"branch.%@.remote", branchName]];
-		if (remoteName && ([remoteName isKindOfClass:[NSString class]] && ![remoteName isEqualToString:@""])) {
+		if (remoteName && ([remoteName isKindOfClass:[NSString class]] && (![remoteName isEqualToString:@""]))) {
 			PBGitRef *remoteRef = [PBGitRef refFromString:[kGitXRemoteRefPrefix stringByAppendingString:remoteName]];
 			// check that the remote is a valid ref and exists
-			if ([self checkRefFormat:[remoteRef ref]] && [self refExists:remoteRef])
+			if ([self checkRefFormat:[remoteRef ref]] && [self refExists:remoteRef checkOnRemotesWithoutBranches:NO resultMessage:Nil])
 				return remoteRef;
 		}
 	}
@@ -716,11 +987,81 @@ dispatch_queue_t PBGetWorkQueue() {
 	return output;
 }
 
+
+- (NSString*) remoteUrl:(NSString*)remoteName
+{
+    NSString *remoteUrl = Nil;
+    NSString *output = [self infoForRemote:remoteName];
+    
+    if (output)
+    {
+        NSCharacterSet *cSet = [NSCharacterSet characterSetWithCharactersInString:@"\n"];
+        NSArray *outputArray = [output componentsSeparatedByCharactersInSet:cSet];
+        remoteUrl = [outputArray objectAtIndex:1];
+        remoteUrl = [remoteUrl stringByReplacingOccurrencesOfString:@"  Fetch URL: " withString:@""];
+    }
+
+    return remoteUrl;
+}
+
+
+- (void) changeRemote:(PBGitRef *)ref toURL:(NSURL*)newUrl;
+{
+	if ((!ref) || (![ref isRemote]))
+    {
+        return;
+    }
+    
+    int gitRetValue = 1;
+    NSArray *arguments;
+    NSString *output;
+    
+    // remember the current vaild remote URL to set back, if an error occurs
+    NSString *currentRemoteURL = [self remoteUrl:[ref remoteName]];
+
+    // Change the URL of the remote
+    arguments = [NSArray arrayWithObjects:@"remote", @"set-url",[ref remoteName], [newUrl path], nil];
+    output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+    
+    // Check if the new URL is valid with fetching it 
+    arguments = [NSArray arrayWithObjects:@"fetch",[ref remoteName], nil];
+    output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+    if (gitRetValue) 
+    {
+        NSString *message = [NSString stringWithFormat:@"There was an error changing URL from Remote %@ to %@.",[ref remoteName],[newUrl path]];
+        [self.windowController showErrorSheetTitle:@"URL was not changed!" message:message arguments:arguments output:output];
+        
+        // Change the URL of the remote back
+        arguments = [NSArray arrayWithObjects:@"remote", @"set-url",[ref remoteName], currentRemoteURL, nil];
+        output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+    }
+}
+
+
+- (BOOL)isRemoteConnected:(NSString*)remoteName
+{
+    if (!remoteName)
+        return NO;
+    
+    // Send a command to the remote and check the ExitCode
+    int gitRetValue = 1;
+    NSArray *arguments = [NSArray arrayWithObjects:@"ls-remote", remoteName, nil];
+    NSLog(@"Start testing connection to remote %@",remoteName);
+    [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+    NSLog(@"Stop testing connection to remote %@",remoteName);
+    if (gitRetValue)
+    {
+        return NO;
+    }
+    return YES;
+}
+
+
 #pragma mark Repository commands
 
 - (void) cloneRepositoryToPath:(NSString *)path bare:(BOOL)isBare
 {
-	if (!path || [path isEqualToString:@""])
+	if ((!path) || [path isEqualToString:@""])
 		return;
 
 	NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"clone", @"--no-hardlinks", @"--", @".", path, nil];
@@ -730,6 +1071,9 @@ dispatch_queue_t PBGetWorkQueue() {
 	NSString *description = [NSString stringWithFormat:@"Cloning the repository %@ to %@", [self projectName], path];
 	NSString *title = @"Cloning Repository";
 	[PBRemoteProgressSheet beginRemoteProgressSheetForArguments:arguments title:title description:description inRepository:self];
+    
+    NSDictionary *userInfoDict = [NSDictionary dictionaryWithObject:path forKey:@"CloneToPath"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"CloneToOperationInProgress" object:self userInfo:userInfoDict];
 }
 
 - (void) beginAddRemote:(NSString *)remoteName forURL:(NSString *)remoteURL
@@ -743,7 +1087,7 @@ dispatch_queue_t PBGetWorkQueue() {
 
 - (void) beginFetchFromRemoteForRef:(PBGitRef *)ref
 {
-	NSMutableArray *arguments = [NSMutableArray arrayWithObject:@"fetch"];
+	NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"fetch", nil];
 
 	if (![ref isRemote]) {
 		NSError *error = nil;
@@ -767,7 +1111,7 @@ dispatch_queue_t PBGetWorkQueue() {
 	NSMutableArray *arguments = [NSMutableArray arrayWithObject:@"pull"];
 
 	// a nil remoteRef means lookup the ref's default remote
-	if (!remoteRef || ![remoteRef isRemote]) {
+	if ((!remoteRef) || (![remoteRef isRemote])) {
 		NSError *error = nil;
 		remoteRef = [self remoteRefForBranch:ref error:&error];
 		if (!remoteRef) {
@@ -789,7 +1133,7 @@ dispatch_queue_t PBGetWorkQueue() {
 	NSMutableArray *arguments = [NSMutableArray arrayWithObject:@"push"];
 
 	// a nil remoteRef means lookup the ref's default remote
-	if (!remoteRef || ![remoteRef isRemote]) {
+	if ((!remoteRef) || (![remoteRef isRemote])) {
 		NSError *error = nil;
 		remoteRef = [self remoteRefForBranch:ref error:&error];
 		if (!remoteRef) {
@@ -810,7 +1154,7 @@ dispatch_queue_t PBGetWorkQueue() {
 		actionType = @"Mirroring";
 	} else {
 		
-		if ([ref isRemote] || !ref) {
+		if ([ref isRemote] || (!ref)) {
 			branchName = @"all updates";
 		}
 		else if ([ref isTag]) {
@@ -854,9 +1198,13 @@ dispatch_queue_t PBGetWorkQueue() {
 	return YES;
 }
 
+
+
+
+
 - (BOOL) checkoutFiles:(NSArray *)files fromRefish:(id <PBGitRefish>)ref
 {
-	if (!files || ([files count] == 0))
+	if ((!files) || ([files count] == 0))
 		return NO;
 
 	NSString *refName = nil;
@@ -947,7 +1295,7 @@ dispatch_queue_t PBGetWorkQueue() {
 
 - (BOOL) createBranch:(NSString *)branchName atRefish:(id <PBGitRefish>)ref
 {
-	if (!branchName || !ref)
+	if ((!branchName) || (!ref))
 		return NO;
 
 	int retValue = 1;
@@ -963,6 +1311,123 @@ dispatch_queue_t PBGetWorkQueue() {
 	return YES;
 }
 
+- (BOOL) renameRef:(PBGitRef*)ref withNewName:(NSString *)newName;
+{
+	if (!ref)
+		return NO;
+    
+    NSString *actHeadSHA;
+    BOOL returnToHead = NO;
+    
+	int gitRetValue = 1;
+    BOOL retValue = YES;
+    NSArray *arguments;
+    NSString *output;
+    
+    if ([ref refishType] == kGitXRemoteType)
+    {
+        arguments = [NSArray arrayWithObjects:@"remote", @"rename", [ref shortName], newName, nil];
+    }
+    else if ([ref refishType] == kGitXBranchType)
+    {
+        // -M move/rename a branch, even if target exists
+        arguments = [NSArray arrayWithObjects:@"branch", @"-M", [ref shortName], newName, nil];
+    }
+    else if ([ref refishType] == kGitXTagType)
+    {
+        // Create a new tag with newName at the Commit where the old one is
+        arguments = [NSArray arrayWithObjects:@"tag", newName, [ref shortName],  nil];
+        output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+        if (gitRetValue) {
+            NSString *message = [NSString stringWithFormat:@"There was an error renaming '%@ %@' to '%@'.", [ref refishType], [ref shortName], newName];
+            [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+            retValue = NO;
+        }
+        
+        if (retValue)
+        {
+            // Delete the old tag from the repo
+            arguments = [NSArray arrayWithObjects:@"tag", @"-d", [ref shortName],  nil];
+        }
+    }
+    else if ([ref refishType] == kGitXRemoteBranchType)
+    {
+        // check if ref is on head
+        if ([[self headSHA] compare:[self shaForRef:ref]])
+        {
+            // Remember current Head SHA to return after renaming the remotebranch
+            actHeadSHA = [self headSHA];
+            
+            // checkout remotebranch to create a new local branch with newName to push it later on the remote
+            arguments = [NSArray arrayWithObjects:@"checkout", [ref shortName], nil];
+            output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+            if (gitRetValue) {
+                NSString *message = [NSString stringWithFormat:@"There was an error checking out remotebranch %@ for renaming.", [ref shortName]];
+                [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+                retValue = NO;
+            }
+            else
+            {
+                returnToHead = YES;
+            }
+        }
+        
+        if (retValue)
+        {
+            // Create an local newName-Branch to push later on the remote
+            arguments = [NSArray arrayWithObjects:@"branch", newName, nil];
+            output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+            if (gitRetValue) {
+                NSString *message = [NSString stringWithFormat:@"There was an error creating the new local branch %@.", newName];
+                [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+                retValue = NO;
+            }
+        }
+        
+        if (retValue)
+        {
+            // Push the newName-Branch to the remote
+            arguments = [NSArray arrayWithObjects:@"push", [ref remoteName], newName, nil];
+            output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+            if (gitRetValue) {
+                NSString *message = [NSString stringWithFormat:@"There was an error pushing the new local branch %@ to the remote %@.", newName, [ref remoteName]];
+                [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+                retValue = NO;
+            }
+        }
+
+        if (retValue)
+        {
+            // Delete the oldName-Branch in the remote
+            arguments = [NSArray arrayWithObjects:@"push", [ref remoteName], [NSString stringWithFormat:@":%@",[ref remoteBranchName]], nil];
+        }
+    }
+    
+	if (retValue)
+    {
+        output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+        if (gitRetValue) {
+            NSString *message = [NSString stringWithFormat:@"There was an error renaming %@ %@ to %@.", [ref refishType], [ref shortName], newName];
+            [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+            retValue = NO;
+        }
+    }
+    
+    if (returnToHead)
+    {
+        arguments = [NSArray arrayWithObjects:@"checkout", actHeadSHA, nil];
+        output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
+        if (gitRetValue) {
+            NSString *message = [NSString stringWithFormat:@"There was an error returning to Head %@.",actHeadSHA];
+            [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+            retValue = NO;
+        }
+    }
+
+    [self reloadRefs];
+    return retValue;
+}
+
 - (BOOL) createTag:(NSString *)tagName message:(NSString *)message atRefish:(id <PBGitRefish>)target
 {
 	if (!tagName)
@@ -971,7 +1436,7 @@ dispatch_queue_t PBGetWorkQueue() {
 	NSMutableArray *arguments = [NSMutableArray arrayWithObject:@"tag"];
 
 	// if there is a message then make this an annotated tag
-	if (message && ![message isEqualToString:@""] && ([message length] > 3)) {
+	if (message && (![message isEqualToString:@""]) && ([message length] > 3)) {
 		[arguments addObject:@"-a"];
 		[arguments addObject:[@"-m" stringByAppendingString:message]];
 	}
@@ -999,7 +1464,7 @@ dispatch_queue_t PBGetWorkQueue() {
 
 - (BOOL) deleteRemote:(PBGitRef *)ref
 {
-	if (!ref || ([ref refishType] != kGitXRemoteType))
+	if ((!ref) || ([ref refishType] != kGitXRemoteType))
 		return NO;
 
 	int retValue = 1;
@@ -1026,19 +1491,129 @@ dispatch_queue_t PBGetWorkQueue() {
 	return YES;
 }
 
+
+- (BOOL) deleteRemoteBranch:(PBGitRef *)ref
+{
+	if ((!ref) || (![ref isRemoteBranch]) )
+    {
+        return NO;
+    }
+    
+    int alertRet = [[NSAlert alertWithMessageText:[NSString stringWithFormat:@"Delete branch %@ on remote %@?",[ref remoteBranchName],[ref remoteName]]
+                                    defaultButton:@"Yes"
+                                  alternateButton:@"No"
+                                      otherButton:nil
+                        informativeTextWithFormat:[NSString stringWithFormat:@"Delete branch %@ on remote %@?",[ref remoteBranchName],[ref remoteName]]]
+                    runModal];
+    
+    if (alertRet == NSAlertDefaultReturn)
+    {
+        NSArray *arguments = [NSArray arrayWithObjects:@"push", [ref remoteName], [NSString stringWithFormat:@":%@",[ref remoteBranchName]], nil];
+        NSString *description = [NSString stringWithFormat:@"Deleting Remotebranch %@ from remote %@",[ref remoteBranchName], [ref remoteName]];
+        NSString *title = @"Deleting Branch from remote";
+        [PBRemoteProgressSheet beginRemoteProgressSheetForArguments:arguments title:title description:description inRepository:self];
+    }
+	return YES;
+}
+
+
+- (BOOL) deleteRemoteTag:(PBGitRef *)ref
+{
+	if ((!ref) || (![ref isTag]) || (![self hasRemotes]))
+    {
+        return NO;
+    }
+
+    NSArray *remotes = [self remotes];
+    NSArray *arguments;
+    
+    for (int i=0; i<[remotes count]; i++)
+    {
+        if ([self refExistsOnRemote:ref remoteName:[remotes objectAtIndex:i] resultMessage:Nil])
+        {
+            BOOL remoteConnected = YES;
+            if (![self isRemoteConnected:[remotes objectAtIndex:i]])
+            {
+                NSString *info = [NSString stringWithFormat:@"Remote %@ is not conneted!",[remotes objectAtIndex:i]];
+                NSError  *error = [NSError errorWithDomain:PBGitRepositoryErrorDomain 
+                                                      code:0
+                                                  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                            [NSString stringWithFormat:@"Can't remove the tag %@ from the remote %@",[ref tagName],[remotes objectAtIndex:i]], NSLocalizedDescriptionKey,
+                                                            info, NSLocalizedRecoverySuggestionErrorKey,
+                                                            nil]
+                                   ];
+                [[NSAlert alertWithError:error]runModal];
+                remoteConnected = NO;
+            }
+            
+            if (remoteConnected)
+            {
+                int alertRet = [[NSAlert alertWithMessageText:[NSString stringWithFormat:@"Delete tag %@ on remote %@?",[ref tagName],[remotes objectAtIndex:i]]
+                                                defaultButton:@"Yes"
+                                              alternateButton:@"No"
+                                                  otherButton:nil
+                                    informativeTextWithFormat:[NSString stringWithFormat:@"Delete tag %@ on remote %@?",[ref tagName],[remotes objectAtIndex:i]]]
+                                runModal];
+                
+                if (alertRet == NSAlertDefaultReturn)
+                {
+                    int retValue = 1;
+                    arguments = [NSArray arrayWithObjects:@"push", [remotes objectAtIndex:i], [NSString stringWithFormat:@":%@",[ref tagName]], nil];
+                    NSString * output = [self outputForArguments:arguments retValue:&retValue];
+                    if (retValue) 
+                    {
+                        NSString *message = [NSString stringWithFormat:@"Deleting Tag %@ on remote %@ failed!",[ref tagName], [remotes objectAtIndex:i]];
+                        NSMutableString *argumentsString = [@"git " mutableCopy];
+                        for (int i=0; i<[arguments count]; i++)
+                        {
+                            [argumentsString appendString:[arguments objectAtIndex:i]];
+                            [argumentsString appendString:@" "];
+                        }
+                        [[NSAlert alertWithMessageText:message
+                                         defaultButton:@"OK" 
+                                       alternateButton:nil 
+                                           otherButton:nil
+                             informativeTextWithFormat:[NSString stringWithFormat:@"%@\n\n%@",argumentsString,output]
+                          ] runModal];
+                    }
+                    
+                    [self reloadRefs];
+
+                }
+            }
+        }
+    }
+    
+	return YES;
+}
+
+
 - (BOOL) deleteRef:(PBGitRef *)ref
 {
 	if (!ref)
 		return NO;
 
 	if ([ref refishType] == kGitXRemoteType)
+    {
 		return [self deleteRemote:ref];
+    }
+    else if ([ref refishType] == kGitXRemoteBranchType)
+    {
+		[self deleteRemoteBranch:ref];
+    }
+    else if ([ref refishType] == kGitXTagType)
+    {
+        if ([self refExistsOnAnyRemote:ref resultMessage:Nil])
+        {
+            [self deleteRemoteTag:ref];
+        }
+    }
 
 	int retValue = 1;
 	NSArray *arguments = [NSArray arrayWithObjects:@"update-ref", @"-d", [ref ref], nil];
 	NSString * output = [self outputForArguments:arguments retValue:&retValue];
 	if (retValue) {
-		NSString *message = [NSString stringWithFormat:@"There was an error deleting the ref: %@\n\n", [ref shortName]];
+		NSString *message = [NSString stringWithFormat:@"There was an error deleting the %@ %@\n\n", [ref refishType], [ref shortName]];
 		[self.windowController showErrorSheetTitle:@"Delete ref failed!" message:message arguments:arguments output:output];
 		return NO;
 	}
@@ -1139,7 +1714,7 @@ dispatch_queue_t PBGetWorkQueue() {
 
 #pragma mark GitX Scripting
 
-- (void)handleRevListArguments:(NSArray *)arguments inWorkingDirectory:(NSURL *)workingDirectory
+- (void)handleRevListArguments:(NSArray *)arguments inWorkingDirectory:(NSURL *)wd
 {
 	if (![arguments count])
 		return;
@@ -1151,13 +1726,13 @@ dispatch_queue_t PBGetWorkQueue() {
 		PBGitRef *refArgument = [self refForName:[arguments lastObject]];
 		if (refArgument) {
 			revListSpecifier = [[PBGitRevSpecifier alloc] initWithRef:refArgument];
-			revListSpecifier.workingDirectory = workingDirectory;
+			revListSpecifier.workingDirectory = wd;
 		}
 	}
 
 	if (!revListSpecifier) {
 		revListSpecifier = [[PBGitRevSpecifier alloc] initWithParameters:arguments];
-		revListSpecifier.workingDirectory = workingDirectory;
+		revListSpecifier.workingDirectory = wd;
 	}
 
 	self.currentBranch = [self addBranch:revListSpecifier];
@@ -1165,7 +1740,7 @@ dispatch_queue_t PBGetWorkQueue() {
 	[self.windowController showHistoryView:self];
 }
 
-- (void)handleBranchFilterEventForFilter:(PBGitXBranchFilterType)filter additionalArguments:(NSMutableArray *)arguments inWorkingDirectory:(NSURL *)workingDirectory
+- (void)handleBranchFilterEventForFilter:(PBGitXBranchFilterType)filter additionalArguments:(NSMutableArray *)arguments inWorkingDirectory:(NSURL *)wd
 {
 	self.currentBranchFilter = filter;
 	[PBGitDefaults setShowStageView:NO];
@@ -1174,11 +1749,11 @@ dispatch_queue_t PBGetWorkQueue() {
 	// treat any additional arguments as a rev-list specifier
 	if ([arguments count] > 1) {
 		[arguments removeObjectAtIndex:0];
-		[self handleRevListArguments:arguments inWorkingDirectory:workingDirectory];
+		[self handleRevListArguments:arguments inWorkingDirectory:wd];
 	}
 }
 
-- (void)handleGitXScriptingArguments:(NSAppleEventDescriptor *)argumentsList inWorkingDirectory:(NSURL *)workingDirectory
+- (void)handleGitXScriptingArguments:(NSAppleEventDescriptor *)argumentsList inWorkingDirectory:(NSURL *)wd
 {
 	NSMutableArray *arguments = [NSMutableArray array];
 	uint argumentsIndex = 1; // AppleEvent list descriptor's are one based
@@ -1202,22 +1777,22 @@ dispatch_queue_t PBGetWorkQueue() {
 	}
 
 	if ([firstArgument isEqualToString:@"--all"]) {
-		[self handleBranchFilterEventForFilter:kGitXAllBranchesFilter additionalArguments:arguments inWorkingDirectory:workingDirectory];
+		[self handleBranchFilterEventForFilter:kGitXAllBranchesFilter additionalArguments:arguments inWorkingDirectory:wd];
 		return;
 	}
 
 	if ([firstArgument isEqualToString:@"--local"]) {
-		[self handleBranchFilterEventForFilter:kGitXLocalRemoteBranchesFilter additionalArguments:arguments inWorkingDirectory:workingDirectory];
+		[self handleBranchFilterEventForFilter:kGitXLocalRemoteBranchesFilter additionalArguments:arguments inWorkingDirectory:wd];
 		return;
 	}
 
 	if ([firstArgument isEqualToString:@"--branch"]) {
-		[self handleBranchFilterEventForFilter:kGitXSelectedBranchFilter additionalArguments:arguments inWorkingDirectory:workingDirectory];
+		[self handleBranchFilterEventForFilter:kGitXSelectedBranchFilter additionalArguments:arguments inWorkingDirectory:wd];
 		return;
 	}
 
 	// if the argument is not a known command then treat it as a rev-list specifier
-	[self handleRevListArguments:arguments inWorkingDirectory:workingDirectory];
+	[self handleRevListArguments:arguments inWorkingDirectory:wd];
 }
 
 // see if the current appleEvent has the command line arguments from the gitx cli
@@ -1234,10 +1809,10 @@ dispatch_queue_t PBGetWorkQueue() {
 		// on app launch there may be many repositories opening, so double check that this is the right repo
 		NSString *path = [[eventRecord paramDescriptorForKeyword:typeFileURL] stringValue];
 		if (path) {
-			NSURL *workingDirectory = [NSURL URLWithString:path];
-			if ([[PBGitRepository gitDirForURL:workingDirectory] isEqual:[self fileURL]]) {
+			NSURL *wd = [NSURL URLWithString:path];
+			if ([[PBGitRepository gitDirForURL:wd] isEqual:[self fileURL]]) {
 				NSAppleEventDescriptor *argumentsList = [eventRecord paramDescriptorForKeyword:kGitXAEKeyArgumentsList];
-				[self handleGitXScriptingArguments:argumentsList inWorkingDirectory:workingDirectory];
+				[self handleGitXScriptingArguments:argumentsList inWorkingDirectory:wd];
 
 				// showWindows may be called more than once during app launch so remove the CLI data after we handle the event
 				[currentAppleEvent removeDescriptorWithKeyword:keyAEPropData];

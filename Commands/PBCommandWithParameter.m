@@ -8,7 +8,8 @@
 
 #import "PBCommandWithParameter.h"
 #import "PBArgumentPickerController.h"
-
+#import "PBGitRepository.h"
+#import "PBGitWindowController.h"
 
 @implementation PBCommandWithParameter
 @synthesize command;
@@ -17,24 +18,17 @@
 
 - initWithCommand:(PBCommand *) aCommand parameterName:(NSString *) param parameterDisplayName:(NSString *) paramDisplayName {
 	if ((self = [super initWithDisplayName:[aCommand displayName] parameters:nil repository:[aCommand repository]])) {
-		command = [aCommand retain];
-		parameterName = [param retain];
-		parameterDisplayName = [paramDisplayName retain];
+		command = aCommand;
+		parameterName = param;
+		parameterDisplayName = paramDisplayName;
 	}
 	return self;
 }
 
-- (void) dealloc {
-	[command release];
-	[parameterName release];
-	[parameterDisplayName release];
-	[super dealloc];
-}
 
 
 - (void) invoke {
 	PBArgumentPickerController *controller = [[PBArgumentPickerController alloc] initWithCommandWithParameter:self];
 	[NSApp beginSheet:[controller window] modalForWindow:[command.repository.windowController window] modalDelegate:controller didEndSelector:nil contextInfo:NULL];
-	[controller release];
 }
 @end
