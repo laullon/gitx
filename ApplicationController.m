@@ -129,11 +129,6 @@
 
 	if (![[NSApplication sharedApplication] isActive])
 		return;
-
-	// The current directory was not enabled or could not be opened (most likely it’s not a git repository).
-	// show an open panel for the user to select a repository to view
-	if ([PBGitDefaults showOpenPanelOnLaunch] && !hasOpenedDocuments && cloneRepositoryPanel == nil)
-		[[PBRepositoryDocumentController sharedDocumentController] openDocument:self];
 }
 
 - (void)getUrl:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
@@ -403,6 +398,19 @@
 	}
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
+{
+    id dc = [PBRepositoryDocumentController sharedDocumentController];
+    
+    // Reopen last document if user prefers
+    if ([PBGitDefaults showOpenPanelOnLaunch])
+    {
+        [dc openDocument:self];
+    }
+    
+    return NO;
 }
 
 /**
