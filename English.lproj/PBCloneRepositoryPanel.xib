@@ -43,7 +43,7 @@
 			<object class="NSWindowTemplate" id="1005">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{63, 1353}, {488, 185}}</string>
+				<string key="NSWindowRect">{{63, 500}, {488, 185}}</string>
 				<int key="NSWTFlags">544735232</int>
 				<string key="NSWindowTitle">Clone Git Repository</string>
 				<string key="NSWindowClass">NSWindow</string>

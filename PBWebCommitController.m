@@ -83,67 +83,76 @@ const NSString *kAuthorKeyDate = @"date";
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadToEndOfFileCompletionNotification object:nil];
 	
-	NSData *data = [[notification userInfo] valueForKey:NSFileHandleNotificationDataItem];
-	if (!data)
-		return;
-	
-	NSString *details = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	if (!details)
-		details = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
-	
-	if (!details)
-		return;
-	
-	// Header
-	NSArray *headerItems = [self parseHeader:details];
-	NSString *header = [self htmlForHeader:headerItems withRefs:[self refsForCurrentCommit]];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSData *data = [[notification userInfo] valueForKey:NSFileHandleNotificationDataItem];
+        if (!data)
+            return;
+        
+        NSString *details = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        if (!details)
+            details = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
+        
+        if (!details)
+            return;
+        
+        // Header
+        NSArray *headerItems = [self parseHeader:details];
+        NSString *header = [self htmlForHeader:headerItems withRefs:[self refsForCurrentCommit]];
 
-	// In case the commit is a merge, we need to explicity give diff-tree the
-	// list of parents, or else it will yield an empty result.
-	// If it's not a merge, this won't hurt.
-	NSMutableArray *allParents = [NSMutableArray array];
+        // In case the commit is a merge, we need to explicity give diff-tree the
+        // list of parents, or else it will yield an empty result.
+        // If it's not a merge, this won't hurt.
+        NSMutableArray *allParents = [NSMutableArray array];
 
-	for (NSDictionary *item in headerItems)
-		if ([[item objectForKey:kHeaderKeyName] isEqualToString:@"parent"])
-			[allParents addObject:[item objectForKey:kHeaderKeyContent]];
+        for (NSDictionary *item in headerItems)
+            if ([[item objectForKey:kHeaderKeyName] isEqualToString:@"parent"])
+                [allParents addObject:[item objectForKey:kHeaderKeyContent]];
 
-	NSArray *parents = [self chooseDiffParents:allParents];
+        NSArray *parents = [self chooseDiffParents:allParents];
 
-	// File Stats
-	NSMutableDictionary *stats = [self parseStats:details];
+        // File Stats
+        NSMutableDictionary *stats = [self parseStats:details];
 
-	// File list
-	NSMutableArray *args = [NSMutableArray arrayWithObjects:@"diff-tree", @"--root", @"-r", @"-C90%", @"-M90%", nil];
-	[args addObjectsFromArray:parents];
-	[args addObject:currentSha];
-	NSString *dt = [repository outputInWorkdirForArguments:args];
-	NSString *fileList = [GLFileView parseDiffTree:dt withStats:stats];
-	
-	// Diffs list
-	args = [NSMutableArray arrayWithObjects:@"diff-tree", @"--root", @"--cc", @"-C90%", @"-M90%", nil];
-	[args addObjectsFromArray:parents];
-	[args addObject:currentSha];
-	NSString *d = [repository outputInWorkdirForArguments:args];
-	NSString *html;
-	if(showLongDiffs || [d length] < 200000)
-	{
-		showLongDiffs = FALSE;
-		NSString *diffs = [GLFileView parseDiff:d];
-		html = [NSString stringWithFormat:@"%@%@<div id='diffs'>%@</div>",header,fileList,diffs];
-	} else {
-		html = [NSString stringWithFormat:@"%@%@<div id='diffs'><p>This is a very large commit. It may take a long time to load the diff. Click <a href='' onclick='showFullDiff(); return false;'>here</a> to show anyway.</p></div>",header,fileList,currentSha];
-	}
+        // File list
+        NSMutableArray *args = [NSMutableArray arrayWithObjects:@"diff-tree", @"--root", @"-r", @"-C90%", @"-M90%", nil];
+        [args addObjectsFromArray:parents];
+        [args addObject:currentSha];
+        NSString *dt = [repository outputInWorkdirForArguments:args];
+        NSString *fileList = [GLFileView parseDiffTree:dt withStats:stats];
+        
+        // Diffs list
+        NSString *loadingSha = currentSha;
+        
+        args = [NSMutableArray arrayWithObjects:@"diff-tree", @"--root", @"--cc", @"-C90%", @"-M90%", nil];
+        [args addObjectsFromArray:parents];
+        [args addObject:loadingSha];
+        NSString *d = [repository outputInWorkdirForArguments:args];
+        NSString *html;
+        if(showLongDiffs || [d length] < 200000)
+        {
+            showLongDiffs = FALSE;
+            NSString *diffs = [GLFileView parseDiff:d];
+            html = [NSString stringWithFormat:@"%@%@<div id='diffs'>%@</div>",header,fileList,diffs];
+        } else {
+            html = [NSString stringWithFormat:@"%@%@<div id='diffs'><p>This is a very large commit. It may take a long time to load the diff. Click <a href='' onclick='showFullDiff(); return false;'>here</a> to show anyway.</p></div>",header,fileList,currentSha];
+        }
 
-	html = [html stringByReplacingOccurrencesOfString:@"{SHA_PREV}" withString:[NSString stringWithFormat:@"%@^",currentSha]];
-	html = [html stringByReplacingOccurrencesOfString:@"{SHA}" withString:currentSha];
-	
-	[[view windowScriptObject] callWebScriptMethod:@"showCommit" withArguments:[NSArray arrayWithObject:html]];
-	
-#ifdef DEBUG_BUILD
-	NSString *dom = [(DOMHTMLElement*)[[[view mainFrame] DOMDocument] documentElement] outerHTML];
-	NSString *tmpFile = @"~/tmp/test2.html";
-	[dom writeToFile:[tmpFile stringByExpandingTildeInPath] atomically:true encoding:NSUTF8StringEncoding error:nil];
-#endif 
+        html = [html stringByReplacingOccurrencesOfString:@"{SHA_PREV}" withString:[NSString stringWithFormat:@"%@^",currentSha]];
+        html = [html stringByReplacingOccurrencesOfString:@"{SHA}" withString:currentSha];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // If a bunch of commits were selected quickly we check to make sure the commit we requested is still active
+            if ([currentSha isEqualToString:loadingSha]) {
+                [[view windowScriptObject] callWebScriptMethod:@"showCommit" withArguments:[NSArray arrayWithObject:html]];
+                
+    #ifdef DEBUG_BUILD
+                NSString *dom = [(DOMHTMLElement*)[[[view mainFrame] DOMDocument] documentElement] outerHTML];
+                NSString *tmpFile = @"~/tmp/test2.html";
+                [dom writeToFile:[tmpFile stringByExpandingTildeInPath] atomically:true encoding:NSUTF8StringEncoding error:nil];
+    #endif
+            }
+        });
+    });
 }
 
 - (NSString*) refsForCurrentCommit

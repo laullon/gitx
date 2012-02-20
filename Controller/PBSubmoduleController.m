@@ -21,36 +21,37 @@
 
 
 - (void) reload {
-	NSArray *arguments = [NSArray arrayWithObjects:@"submodule", @"status", @"--recursive", nil];
-	NSString *output = [repository outputInWorkdirForArguments:arguments];
-	NSArray *lines = [output componentsSeparatedByString:@"\n"];
-	
-	NSMutableArray *loadedSubmodules = [[NSMutableArray alloc] initWithCapacity:[lines count]];
-	
-	for (NSString *submoduleLine in lines) {
-		if ([submoduleLine length] == 0)
-			continue;
-		PBGitSubmodule *submodule = [[PBGitSubmodule alloc] initWithRawSubmoduleStatusString:submoduleLine];
-		if (submodule)
-			[loadedSubmodules addObject:submodule];
-	}
-	
-	NSMutableArray *groupedSubmodules = [[NSMutableArray alloc] init];
-	for (PBGitSubmodule *submodule in loadedSubmodules) {
-		BOOL added = NO;
-		for (PBGitSubmodule *addedItem in groupedSubmodules) {
-			if ([[submodule path] hasPrefix:[addedItem path]]) {
-				[addedItem addSubmodule:submodule];
-				added = YES;
-			}
-		}
-		if (!added) {
-			[groupedSubmodules addObject:submodule];
-		}
-	}
-	
-	
-	submodules = loadedSubmodules;
+    dispatch_async(PBGetWorkQueue(), ^{
+        NSArray *arguments = [NSArray arrayWithObjects:@"submodule", @"status", @"--recursive", nil];
+        NSString *output = [repository outputInWorkdirForArguments:arguments];
+        NSArray *lines = [output componentsSeparatedByString:@"\n"];
+        
+        NSMutableArray *loadedSubmodules = [[NSMutableArray alloc] initWithCapacity:[lines count]];
+        
+        for (NSString *submoduleLine in lines) {
+            if ([submoduleLine length] == 0)
+                continue;
+            PBGitSubmodule *submodule = [[PBGitSubmodule alloc] initWithRawSubmoduleStatusString:submoduleLine];
+            if (submodule)
+                [loadedSubmodules addObject:submodule];
+        }
+        
+        NSMutableArray *groupedSubmodules = [[NSMutableArray alloc] init];
+        for (PBGitSubmodule *submodule in loadedSubmodules) {
+            BOOL added = NO;
+            for (PBGitSubmodule *addedItem in groupedSubmodules) {
+                if ([[submodule path] hasPrefix:[addedItem path]]) {
+                    [addedItem addSubmodule:submodule];
+                    added = YES;
+                }
+            }
+            if (!added) {
+                [groupedSubmodules addObject:submodule];
+            }
+        }
+        
+        submodules = loadedSubmodules;
+    });
 }
 
 #pragma mark -
