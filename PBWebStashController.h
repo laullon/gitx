@@ -10,7 +10,9 @@
 @class PBStashContentController;
 
 @interface PBWebStashController : PBWebCommitController {
-	IBOutlet PBStashContentController *stashController;
+	__unsafe_unretained PBStashContentController *stashController;
 }
+
+@property(nonatomic, unsafe_unretained) IBOutlet PBStashContentController *stashController;
 
 @end

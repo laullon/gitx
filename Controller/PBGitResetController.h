@@ -13,7 +13,7 @@
 @protocol PBGitRefish;
 
 @interface PBGitResetController : NSObject {
-	PBGitRepository *repository;
+	__unsafe_unretained PBGitRepository *repository;
 }
 - (id) initWithRepository:(PBGitRepository *) repo;
 

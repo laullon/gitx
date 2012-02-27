@@ -13,7 +13,9 @@
 
 
 @interface PBQLTextView : NSTextView {
-	IBOutlet PBGitHistoryController *controller;
+	__unsafe_unretained PBGitHistoryController *controller;
 }
+
+@property(nonatomic, unsafe_unretained) IBOutlet PBGitHistoryController *controller;
 
 @end

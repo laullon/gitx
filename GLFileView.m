@@ -30,6 +30,8 @@
 
 @implementation GLFileView
 
+@synthesize historyController, typeBar;
+
 - (void) awakeFromNib
 {
 	NSString *formatFile = [[NSBundle mainBundle] pathForResource:@"format" ofType:@"html" inDirectory:@"html/views/log"];

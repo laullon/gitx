@@ -18,8 +18,8 @@
 @class PBGitGradientBarView;
 
 @interface GLFileView : PBWebController <MGScopeBarDelegate> {
-	IBOutlet PBGitHistoryController* historyController;
-	IBOutlet MGScopeBar *typeBar;
+	__unsafe_unretained PBGitHistoryController* historyController;
+	__unsafe_unretained MGScopeBar *typeBar;
 	NSMutableArray *groups;
 	NSString *logFormat;
 	NSString *diffType;
@@ -28,6 +28,9 @@
     IBOutlet NSSearchField *searchField;
     PBGitTree *lastFile;
 }
+
+@property(nonatomic, unsafe_unretained) IBOutlet PBGitHistoryController *historyController;
+@property(nonatomic, unsafe_unretained) IBOutlet MGScopeBar *typeBar;
 
 - (void)showFile;
 - (void)didLoad;

@@ -17,7 +17,7 @@
 
 
 @interface PBGitHistoryGrapher : NSObject {
-	id delegate;
+	__unsafe_unretained id delegate;
 	NSOperationQueue *currentQueue;
 
 	NSMutableSet *searchSHAs;

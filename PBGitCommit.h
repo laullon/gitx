@@ -29,7 +29,7 @@ extern NSString * const kGitXCommitType;
 	int timestamp;
 	char sign;
 	id lineInfo;
-	PBGitRepository* repository;
+	__unsafe_unretained PBGitRepository* repository;
 }
 
 + (PBGitCommit *)commitWithRepository:(PBGitRepository*)repo andSha:(NSString *)newSha;
@@ -65,6 +65,6 @@ extern NSString * const kGitXCommitType;
 @property (readonly) NSString* details;
 @property (readonly) PBGitTree* tree;
 @property (readonly) NSArray* treeContents;
-@property (strong) PBGitRepository* repository;
+@property (unsafe_unretained) PBGitRepository* repository;
 @property (strong) id lineInfo;
 @end

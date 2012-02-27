@@ -21,7 +21,7 @@ typedef enum historySearchModes {
 
 
 @interface PBHistorySearchController : NSObject {
-	PBGitHistoryController *historyController;
+	__unsafe_unretained PBGitHistoryController *historyController;
 	NSArrayController *commitController;
 
 	PBHistorySearchMode searchMode;
@@ -38,7 +38,7 @@ typedef enum historySearchModes {
 	NSPanel *rewindPanel;
 }
 
-@property (strong) IBOutlet PBGitHistoryController *historyController;
+@property (unsafe_unretained) IBOutlet PBGitHistoryController *historyController;
 @property (strong) IBOutlet NSArrayController *commitController;
 
 @property (strong) IBOutlet NSSearchField *searchField;

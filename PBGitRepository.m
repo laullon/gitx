@@ -1965,9 +1965,4 @@ dispatch_queue_t PBGetWorkQueue() {
 	return nil;
 }
 
-- (void) finalize
-{
-	//DLog(@"Dealloc of repository");
-	[super finalize];
-}
 @end

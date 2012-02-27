@@ -13,6 +13,7 @@
 
 @implementation PBCommitList
 
+@synthesize webController, controller, searchController;
 @synthesize mouseDownPoint;
 @synthesize useAdjustScroll;
 

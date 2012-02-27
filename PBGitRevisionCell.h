@@ -16,9 +16,13 @@
 	PBGitCommit *objectValue;
 	PBGraphCellInfo *cellInfo;
 	NSTextFieldCell *textCell;
-	IBOutlet PBGitHistoryController *controller;
-	IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
+	__unsafe_unretained PBGitHistoryController *controller;
+	__unsafe_unretained id<PBRefContextDelegate> contextMenuDelegate;
 }
+
+@property(nonatomic, unsafe_unretained) IBOutlet PBGitHistoryController *controller;
+@property(nonatomic, unsafe_unretained) IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
+
 
 - (int) indexAtX:(float)x;
 - (NSRect) rectAtIndex:(int)index;

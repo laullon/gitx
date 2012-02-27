@@ -13,6 +13,7 @@
 
 @implementation PBGitRevisionCell
 
+@synthesize controller, contextMenuDelegate;
 
 - (id) initWithCoder: (id) coder
 {

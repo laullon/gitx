@@ -12,6 +12,8 @@
 
 @implementation PBWebHistoryController
 
+@synthesize historyController;
+
 - (void) awakeFromNib
 {
 	startFile = @"history";

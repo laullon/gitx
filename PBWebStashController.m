@@ -9,6 +9,8 @@
 
 @implementation PBWebStashController
 
+@synthesize stashController;
+
 - (void)selectCommit:(NSString *)sha
 {
 	[[stashController superController] selectCommitForSha:sha];

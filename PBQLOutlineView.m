@@ -11,6 +11,8 @@
 
 @implementation PBQLOutlineView
 
+@synthesize controller;
+
 - initWithCoder: (NSCoder *) coder
 {
 	id a = [super initWithCoder:coder];

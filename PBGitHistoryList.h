@@ -16,7 +16,7 @@
 @class PBGitHistoryGrapher;
 
 @interface PBGitHistoryList : NSObject {
-	PBGitRepository *repository;
+	__unsafe_unretained PBGitRepository *repository;
 
 	PBGitRevList *projectRevList;
 	PBGitRevList *currentRevList;

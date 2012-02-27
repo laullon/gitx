@@ -483,11 +483,12 @@
 {
 	[self saveSplitViewPosition];
 
-	if (commitController) {
-		[commitController removeObserver:self forKeyPath:@"selection"];
-		[commitController removeObserver:self forKeyPath:@"arrangedObjects.@count"];
-		[treeController removeObserver:self forKeyPath:@"selection"];
+	[commitController removeObserver:self forKeyPath:@"selection"];
+	[commitController removeObserver:self forKeyPath:@"arrangedObjects.@count"];
+	[treeController removeObserver:self forKeyPath:@"selection"];
 
+	//Only stop these observations if the nib got loaded
+	if (hasViewLoaded) {
 		[repository.revisionList removeObserver:self forKeyPath:@"isUpdating"];
 		[repository removeObserver:self forKeyPath:@"currentBranch"];
 		[repository removeObserver:self forKeyPath:@"refs"];

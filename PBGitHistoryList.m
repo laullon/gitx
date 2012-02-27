@@ -85,10 +85,9 @@
 
 - (void)cleanup
 {
-	if (currentRevList) {
-		[currentRevList removeObserver:self forKeyPath:@"commits"];
-		[currentRevList cancel];
-	}
+	[currentRevList removeObserver:self forKeyPath:@"commits"];
+	[currentRevList cancel];
+	
 	[graphQueue cancelAllOperations];
 
 	[repository removeObserver:self forKeyPath:@"currentBranch"];

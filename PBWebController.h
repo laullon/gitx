@@ -20,11 +20,11 @@
 	NSMapTable *callbacks;
 
 	// For the repository access
-	IBOutlet PBGitRepository *repository;
+	IBOutlet __unsafe_unretained PBGitRepository *repository;
 }
 
 @property (strong) NSString *startFile;
-@property (strong) PBGitRepository *repository;
+@property (unsafe_unretained) PBGitRepository *repository;
 
 - (WebScriptObject *) script;
 - (void) closeView;

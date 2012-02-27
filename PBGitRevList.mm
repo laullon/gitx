@@ -238,6 +238,17 @@ using namespace std;
 
 	[task terminate];
 	[task waitUntilExit];
+	
+	//Nasty hack to work around ARC and bindings getting angry at each other
+	//Without this some of the view controllers can get released while not on the main thread, which crashes in bindings
+	__block PBGitRepository *tempRepository = repository;
+	
+	double delayInSeconds = 2.0;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		if ([tempRepository isKindOfClass:[PBGitRepository class]]) {
+		}
+	});
 }
 
 @end

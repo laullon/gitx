@@ -13,6 +13,8 @@
 
 @implementation GitXTextFieldCell
 
+@synthesize contextMenuDelegate;
+
 - (NSColor *)highlightColorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
 	// disables the cell's selection highlight

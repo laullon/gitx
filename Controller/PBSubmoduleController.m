@@ -50,7 +50,11 @@
             }
         }
         
-        submodules = loadedSubmodules;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self willChangeValueForKey:@"submodules"];
+			submodules = loadedSubmodules;
+			[self didChangeValueForKey:@"submodules"];
+		});
     });
 }
 

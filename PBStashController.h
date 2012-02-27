@@ -13,7 +13,7 @@
 
 @interface PBStashController : NSObject {
 @private
-    PBGitRepository *repository;
+    __unsafe_unretained PBGitRepository *repository;
 }
 
 - (id) initWithRepository:(PBGitRepository *) repo;

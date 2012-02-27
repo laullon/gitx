@@ -14,7 +14,7 @@
 
 @interface PBSubmoduleController : NSObject {
 @private
-	PBGitRepository *repository;
+	__unsafe_unretained PBGitRepository *repository;
     NSArray *submodules;
 }
 

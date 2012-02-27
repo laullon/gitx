@@ -23,18 +23,12 @@
 
 // Controls the split history view from PBGitHistoryView.xib
 @interface PBGitHistoryController : PBViewController PROTOCOL_10_6(NSOutlineViewDelegate){
-	IBOutlet PBRefController *refController;
 	IBOutlet NSSearchField *searchField;
-	IBOutlet NSArrayController*  commitController;
 	IBOutlet NSSearchField *filesSearchField;
-	IBOutlet NSTreeController*  treeController;
 	IBOutlet NSOutlineView* fileBrowser;
 	NSArray *currentFileBrowserSelectionPath;
-	IBOutlet PBCommitList*  commitList;
-	IBOutlet NSSplitView *historySplitView;
 	IBOutlet PBWebHistoryController *webHistoryController;
 	QLPreviewPanel* previewPanel;
-	IBOutlet PBHistorySearchController *searchController;
 	IBOutlet GLFileView *fileView;
 
 	IBOutlet PBGitGradientBarView *upperToolbarView;
@@ -57,15 +51,15 @@
 	PBGitCommit *selectedCommitBeforeRefresh;
 }
 
-@property (readonly) NSTreeController* treeController;
-@property (readonly) NSSplitView *historySplitView;
+@property (unsafe_unretained) IBOutlet NSTreeController* treeController;
+@property (unsafe_unretained) IBOutlet NSSplitView *historySplitView;
 @property (nonatomic,assign) int selectedCommitDetailsIndex;
 @property (strong) PBGitCommit *webCommit;
 @property (strong) PBGitTree* gitTree;
-@property (readonly) NSArrayController *commitController;
-@property (readonly) PBRefController *refController;
-@property (readonly) PBHistorySearchController *searchController;
-@property (readonly) PBCommitList *commitList;
+@property (unsafe_unretained) IBOutlet NSArrayController *commitController;
+@property (unsafe_unretained) IBOutlet PBRefController *refController;
+@property (unsafe_unretained) IBOutlet PBHistorySearchController *searchController;
+@property (unsafe_unretained) PBCommitList *commitList;
 
 - (IBAction) setDetailedView:(id)sender;
 - (IBAction) setTreeView:(id)sender;

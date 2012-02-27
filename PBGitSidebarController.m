@@ -91,6 +91,7 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 	[commitViewController closeView];
 	[stashViewController closeView];
 	
+    [repository removeObserver:self forKeyPath:@"refs"];
 	[repository removeObserver:self forKeyPath:@"currentBranch"];
 	[repository removeObserver:self forKeyPath:@"branches"];
 	[repository removeObserver:self forKeyPath:@"stashController.stashes"];

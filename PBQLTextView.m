@@ -12,6 +12,8 @@
 
 @implementation PBQLTextView
 
+@synthesize controller;
+
 - (void) keyDown: (NSEvent *) event
 {
 	if ([[event characters] isEqualToString:@" "]) {

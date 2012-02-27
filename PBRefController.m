@@ -27,6 +27,8 @@
 
 @implementation PBRefController
 
+@synthesize historyController;
+
 -(void)dealloc
 {
     actDropInfo = Nil;

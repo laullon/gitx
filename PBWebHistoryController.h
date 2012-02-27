@@ -12,7 +12,9 @@
 @class PBGitHistoryController;
 
 @interface PBWebHistoryController : PBWebCommitController {
-	IBOutlet PBGitHistoryController* historyController;
+	__unsafe_unretained PBGitHistoryController* historyController;
 }
+
+@property(nonatomic, unsafe_unretained) IBOutlet PBGitHistoryController *historyController;
 
 @end

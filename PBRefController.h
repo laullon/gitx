@@ -16,7 +16,7 @@
 @class PBRefMenuItem;
 
 @interface PBRefController : NSObject <PBRefContextDelegate> {
-	IBOutlet PBGitHistoryController *historyController;
+	__unsafe_unretained PBGitHistoryController *historyController;
 	IBOutlet NSArrayController *commitController;
 	IBOutlet PBCommitList *commitList;
 
@@ -24,6 +24,8 @@
     NSDictionary *actDropInfo;
     PBGitRef *actRef;
 }
+
+@property(nonatomic, unsafe_unretained) IBOutlet PBGitHistoryController *historyController;
 
 - (void) fetchRemote:(PBRefMenuItem *)sender;
 - (void) pullRemote:(PBRefMenuItem *)sender;

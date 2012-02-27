@@ -11,7 +11,9 @@
 
 
 @interface GitXTextFieldCell : NSTextFieldCell {
-	IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
+	__unsafe_unretained id<PBRefContextDelegate> contextMenuDelegate;
 }
+
+@property(nonatomic, unsafe_unretained) IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
 
 @end
