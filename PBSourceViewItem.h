@@ -27,6 +27,7 @@
 - (NSString *)helpText;
 
 - (void)addChild:(PBSourceViewItem *)child;
+- (void)addChildWithoutSort:(PBSourceViewItem *)child;
 - (void)removeChild:(PBSourceViewItem *)child;
 
 // This adds the ref to the path, which should match the item's title,

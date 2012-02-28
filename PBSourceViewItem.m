@@ -62,6 +62,15 @@
 	[self.children sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)]]];
 }
 
+- (void)addChildWithoutSort:(PBSourceViewItem *)child
+{
+	if (!child)
+		return;
+    
+	[self.children addObject:child];
+	child.parent = self;    
+}
+
 - (void)removeChild:(PBSourceViewItem *)child
 {
 	if (!child)

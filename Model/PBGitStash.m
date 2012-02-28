@@ -37,7 +37,7 @@
 #pragma mark Presentable
 
 - (NSString *) displayDescription {
-	return [NSString stringWithFormat:@"%@ (%@)", self.message, self.name];
+    return [NSString stringWithFormat:@"%@: %@", self.name, self.message];
 }
 
 - (NSString *) popupDescription {
