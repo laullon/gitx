@@ -131,10 +131,10 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 			[stashes addChildWithoutSort:item];
 			lastItem = item;
 		}
+		[sourceView reloadData];
 		if (lastItem) {
 			[sourceView PBExpandItem:lastItem expandParents:YES];
 		}
-		[sourceView reloadData];
 	} else if ([kObservingContextSubmodules isEqualToString:(__bridge NSString *)context]) {
 		[submodules.children removeAllObjects];
 		NSArray *newSubmodules = [change objectForKey:NSKeyValueChangeNewKey];
