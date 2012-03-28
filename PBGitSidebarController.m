@@ -65,7 +65,8 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 	commitViewController = [[PBGitCommitController alloc] initWithRepository:repository superController:superController];
 	stashViewController = [[PBStashContentController alloc] initWithRepository:repository superController:superController];
 	
-	[stashViewController loadView];
+	[historyViewController view]; //preload historyViewController so the contextual menus in the sidebar work
+	[stashViewController view];
 	
 	[repository addObserver:self forKeyPath:@"refs" options:0 context:@"updateRefs"];
 	[repository addObserver:self forKeyPath:@"currentBranch" options:0 context:@"currentBranchChange"];
@@ -137,6 +138,8 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 		}
 	} else if ([kObservingContextSubmodules isEqualToString:(__bridge NSString *)context]) {
 		[submodules.children removeAllObjects];
+		[sourceView reloadData]; //reload now otherwise the outline view may crash while loading old objects
+		
 		NSArray *newSubmodules = [change objectForKey:NSKeyValueChangeNewKey];
 		
 		for (PBGitSubmodule *submodule in newSubmodules) {
