@@ -21,6 +21,11 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	free(lines);
+}
+
 - (void)setLines:(struct PBGitGraphLine *)l
 {
 	free(lines);
