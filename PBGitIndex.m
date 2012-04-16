@@ -240,7 +240,7 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
                                   hookOutput];
         }
 
-        if (![repository executeHook:@"commit-msg" withArgs:[NSArray arrayWithObject:commitMessageFile] output:nil]) {
+        if (![repository executeHook:@"commit-msg" withArgs:[NSArray arrayWithObject:commitMessageFile] output:&hookOutput]) {
             hookFailureMessage = [NSString stringWithFormat:@"Commit-msg hook failed%@%@",
                                   [hookOutput length] > 0 ? @":\n" : @"",
                                   hookOutput];
