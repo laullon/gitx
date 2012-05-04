@@ -14,16 +14,19 @@
 	PBGitRepository *repository;
 	NSString *displayName;
 	NSMutableArray *parameters;
+	BOOL confirmAction;
 	BOOL canBeFired;
 }
 
 @property BOOL canBeFired;
+@property (readonly) BOOL confirmAction;
 @property (readonly) PBGitRepository *repository;
 @property (strong) NSString *commandTitle;
 @property (strong) NSString *commandDescription;
 @property (readonly) NSString *displayName;
 
 - (id) initWithDisplayName:(NSString *) aDisplayName parameters:(NSArray *) params repository:(PBGitRepository *) repo;
+- (id) initWithDisplayName:(NSString *) aDisplayName parameters:(NSArray *) params repository:(PBGitRepository *) repo confirmAction:(BOOL) confirm;
 - (void) invoke;
 - (NSArray *) allParameters;
 - (void) appendParameters:(NSArray *) params;

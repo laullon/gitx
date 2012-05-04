@@ -62,19 +62,19 @@
 	NSMutableArray *commands = [[NSMutableArray alloc] init];
 	
 	NSArray *args = [NSArray arrayWithObjects:@"stash", @"apply", [stash name], nil];
-	PBCommand *command = [[PBCommand alloc] initWithDisplayName:@"Apply" parameters:args repository:repository];
+	PBCommand *command = [[PBCommand alloc] initWithDisplayName:@"Apply" parameters:args repository:repository confirmAction:TRUE];
 	command.commandTitle = command.displayName;
 	command.commandDescription = [NSString stringWithFormat:@"Applying stash: '%@'", stash];
 	[commands addObject:command];
 	
 	args = [NSArray arrayWithObjects:@"stash", @"pop", [stash name], nil];
-	command = [[PBCommand alloc] initWithDisplayName:@"Pop" parameters:args repository:repository];
+	command = [[PBCommand alloc] initWithDisplayName:@"Pop" parameters:args repository:repository confirmAction:TRUE];
 	command.commandTitle = command.displayName;
 	command.commandDescription = [NSString stringWithFormat:@"Poping stash: '%@'", stash];
 	[commands addObject:command];
 	
 	args = [NSArray arrayWithObjects:@"stash", @"drop", [stash name], nil];
-	command = [[PBCommand alloc] initWithDisplayName:@"Drop" parameters:args repository:repository];
+	command = [[PBCommand alloc] initWithDisplayName:@"Drop" parameters:args repository:repository confirmAction:TRUE];
 	command.commandTitle = command.displayName;
 	command.commandDescription = [NSString stringWithFormat:@"Dropping stash: '%@'", stash];
 	[commands addObject:command];
