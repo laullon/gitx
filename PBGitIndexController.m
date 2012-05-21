@@ -10,8 +10,10 @@
 #import "PBChangedFile.h"
 #import "PBGitRepository.h"
 #import "PBGitIndex.h"
+#import "PBGitDefaults.h"
 
 #define FileChangesTableViewType @"GitFileChangedType"
+#define kDialogDeleteFiles @"Delete Files"
 
 @interface PBGitIndexController ()
 - (void)discardChangesForFiles:(NSArray *)files force:(BOOL)force;
@@ -105,12 +107,18 @@
 		[menu addItem:unstageItem];
 	}
 
-	NSString *title = [selectedFiles count] == 1 ? @"Open file" : @"Open files";
-	NSMenuItem *openItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(openFilesAction:) keyEquivalent:@""];
+	NSString *openTitle = [selectedFiles count] == 1 ? @"Open file" : @"Open files";
+	NSMenuItem *openItem = [[NSMenuItem alloc] initWithTitle:openTitle action:@selector(openFilesAction:) keyEquivalent:@""];
 	[openItem setTarget:self];
 	[openItem setRepresentedObject:selectedFiles];
 	[menu addItem:openItem];
 
+    NSString *deleteTitle = [selectedFiles count] == 1 ? @"Delete file…" : @"Delete files…";
+	NSMenuItem *deleteItem = [[NSMenuItem alloc] initWithTitle:deleteTitle action:@selector(showDeleteFilesSheet:) keyEquivalent:@""];
+	[deleteItem setTarget:self];
+	[deleteItem setRepresentedObject:selectedFiles];
+	[menu addItem:deleteItem];
+    
 	// Attempt to ignore
 	if ([self allSelectedCanBeIgnored:selectedFiles]) {
 		NSString *ignoreText = [selectedFiles count] == 1 ? @"Ignore File": @"Ignore Files";
@@ -176,6 +184,60 @@
 	NSString *workingDirectory = [commitController.repository workingDirectory];
 	for (PBChangedFile *file in files)
 		[[NSWorkspace sharedWorkspace] openFile:[workingDirectory stringByAppendingPathComponent:[file path]]];
+}
+
+- (void) doDeleteFiles:(NSArray *)files {
+	NSString *workingDirectory = [[commitController.repository workingDirectory] stringByAppendingString:@"/"];
+	NSString *path;
+    NSArray *filenamesArray;
+	NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+    
+	for (PBChangedFile *file in files) {
+		path = [workingDirectory stringByAppendingPathComponent:[file path]];
+        filenamesArray = [NSArray arrayWithObject:[path lastPathComponent]];
+        [ws performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:filenamesArray tag:nil];
+	}
+	[commitController.index refresh];
+}
+
+- (void)showDeleteFilesSheet:(id)sender
+{
+	NSArray *files = [sender representedObject];
+    NSMutableString *filesPathsString = [[NSMutableString alloc] init];
+    
+    for (PBChangedFile *file in files) {
+        [filesPathsString appendString:[file path]];
+        [filesPathsString appendString:@"\n"];
+    }
+    
+    if ([PBGitDefaults isDialogWarningSuppressedForDialog:kDialogDeleteFiles]) {
+		[self doDeleteFiles:files];
+		return;
+	}
+    
+	NSAlert *alert = [NSAlert alertWithMessageText:[NSString stringWithFormat:@"Delete files?"]
+									 defaultButton:@"Delete"
+								   alternateButton:@"Cancel"
+									   otherButton:nil
+						 informativeTextWithFormat:@"Are you sure you want to move the following files to the trash?\n\n%@\nYou cannot undo this operation.", filesPathsString];
+    [alert setShowsSuppressionButton:YES];
+	
+	[alert beginSheetModalForWindow:[[commitController view] window]
+					  modalDelegate:self
+					 didEndSelector:@selector(deleteFilesSheetDidEnd:returnCode:contextInfo:)
+						contextInfo:(__bridge void *) files];
+}
+
+- (void)deleteFilesSheetDidEnd:(NSAlert *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{    
+	if ([[sheet suppressionButton] state] == NSOnState)
+        [PBGitDefaults suppressDialogWarningForDialog:kDialogDeleteFiles];
+    
+    NSArray *files = (__bridge NSArray*) contextInfo;
+    
+	if (returnCode == NSAlertDefaultReturn) {
+		[self doDeleteFiles:files];
+	}
 }
 
 - (void) ignoreFilesAction:(id) sender
