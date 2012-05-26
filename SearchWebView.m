@@ -79,9 +79,16 @@
     
     DOMRange *selection;
     
+    // Back-up the search field's caret position so we can restore it later
+    NSRange searchFieldSelectedRange = [[sender currentEditor] selectedRange];
+    
     if([searchString length]>0){
         selection=[self highlightAllOccurencesOfString:searchString];
+        
+        // Bring the search field back in focus and restore its caret position
         [[sender window] makeFirstResponder:sender];
+        [[sender currentEditor] setSelectedRange:searchFieldSelectedRange];
+        
         if(selection!=nil)
             [self setSelectedDOMRange:selection affinity:NSSelectionAffinityDownstream];
     }else{
