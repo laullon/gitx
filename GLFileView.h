@@ -26,6 +26,8 @@
 	IBOutlet NSView *accessoryView;
 	IBOutlet NSSplitView *fileListSplitView;
     IBOutlet NSSearchField *searchField;
+    IBOutlet NSSegmentedControl *stepper;
+    IBOutlet NSTextField *numberOfMatches;
     PBGitTree *lastFile;
 }
 
@@ -51,9 +53,13 @@
 
 - (void) openFileMerge:(NSString*)file sha:(NSString *)sha sha2:(NSString *)sha2;
 
--(IBAction)updateSearch:(NSSearchField *)sender;
+- (IBAction)searchFieldChanged:(NSSearchField *)sender;
+- (IBAction)stepperPressed:(id)sender;
   
 @property(strong) NSMutableArray *groups;
 @property(strong) NSString *logFormat;
 
+@property (strong) IBOutlet NSSegmentedControl *stepper;
+@property (strong) IBOutlet NSSearchField *searchField;
+@property (strong) IBOutlet NSTextField *numberOfMatches;
 @end

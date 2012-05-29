@@ -30,7 +30,7 @@
 
 @implementation GLFileView
 
-@synthesize historyController, typeBar;
+@synthesize historyController, typeBar, stepper, searchField, numberOfMatches, groups, logFormat;
 
 - (void) awakeFromNib
 {
@@ -140,7 +140,7 @@
             }else{
                 [script callWebScriptMethod:@"setMessage" withArguments:[NSArray arrayWithObjects:[theError localizedDescription], nil]];
             }
-            [self updateSearch:searchField];
+            [self updateSearch];
         }
 	}
     
@@ -681,17 +681,62 @@
 	[fileListSplitView setHidden:NO];
 }
 
-#pragma mark IBActions
-
--(IBAction)updateSearch:(NSSearchField *)sender
-{
-    [view updateSearch:sender];
-}
+// -------------
+// File search
+// -------------
 
 #pragma mark -
+#pragma mark Search
+
+NSString *searchString;
+
+- (NSString *)numberOfMatchesString
+{    
+	if ([view resultCount] == 0)
+		return @"Not found";
+    
+	if ([view resultCount] == 1)
+		return @"1 match";
+    
+	return [NSString stringWithFormat:@"%d matches", [view resultCount]];
+}
+
+- (void) updateSearch
+{
+    [view search:searchField update:YES direction:YES];
+    [self updateSearchUI];
+}
+
+- (void) updateSearchUI
+{
+    if ([searchString length] == 0) {
+        [numberOfMatches setHidden:YES];
+		[stepper setHidden:YES];
+    }
+    else {
+        [numberOfMatches setHidden:NO];
+		[stepper setHidden:NO];
+        [numberOfMatches setStringValue:[self numberOfMatchesString]];
+        [stepper setEnabled:([view resultCount]>0)];
+    }
+}
+
+- (IBAction)searchFieldChanged:(id)sender
+{
+    BOOL update=[[searchField stringValue] isEqualToString:searchString]? NO: YES;
+    searchString=[searchField stringValue];
+    [view search:searchField update:update direction:YES];
+    [self updateSearchUI];
+}
 
 
-@synthesize groups;
-@synthesize logFormat;
+- (IBAction)stepperPressed:(id)sender {
+    NSInteger selectedSegment = [sender selectedSegment];
+    
+	if (selectedSegment == 0)
+        [view search:searchField update:NO direction:NO];
+	else
+		[view search:searchField update:NO direction:YES];
+}
 
 @end

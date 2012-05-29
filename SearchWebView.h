@@ -11,9 +11,11 @@
 
 @interface WebView (SearchWebView)
 
-- (DOMRange *)highlightAllOccurencesOfString:(NSString*)str;
-- (NSInteger)highlightAllOccurencesOfString:(NSString*)str inNode:(DOMNode *)node;
+@property(readonly) int resultCount;
+
+- (void)highlightAllOccurencesOfString:(NSString*)str direction:(BOOL)forward;
+- (void)highlightAllOccurencesOfString:(NSString*)str inNode:(DOMNode *)node;
 - (void)removeAllHighlights;
-- (void)updateSearch:(NSSearchField *)sender;
+- (void)search:(NSSearchField *)sender update:(BOOL)update direction:(BOOL)forward;
 
 @end

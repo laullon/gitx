@@ -10,9 +10,15 @@
 
 @implementation WebView (SearchWebView)
 
-- (NSInteger)highlightAllOccurencesOfString:(NSString*)str inNode:(DOMNode *)_node
+int resultCount=0;
+DOMRange *result=nil;
+
+- (int) resultCount {
+    return resultCount;
+}
+
+- (void)highlightAllOccurencesOfString:(NSString*)str inNode:(DOMNode *)_node
 {
-    NSInteger count=0;
     DOMDocument *document=[[self mainFrame] DOMDocument];
     
     DOMNodeList *nodes=[_node childNodes];
@@ -30,7 +36,7 @@
                     
                     while([scanner scanString:str intoString:&block]){
                         DOMElement *span=[document createElement:@"span"];
-                        [span setAttribute:@"id" value:[NSString stringWithFormat:@"SWVHL_%d",count++]];
+                        [span setAttribute:@"id" value:[NSString stringWithFormat:@"SWVHL_%d",resultCount++]];
                         [span setAttribute:@"class" value:@"SWVHL"];
                         newNode=[document createTextNode:block];
                         [span appendChild:newNode];
@@ -40,57 +46,47 @@
                 [[node parentNode] removeChild:node];
             }
         }else if([node nodeType]==DOM_ELEMENT_NODE){
-            count+=[self highlightAllOccurencesOfString:str inNode:node];
+            [self highlightAllOccurencesOfString:str inNode:node];
         }else{
             DLog(@"--->%@",node);
         }
         node=[node nextSibling];
     }
-    
-    return count;
 }
 
-- (DOMRange *)highlightAllOccurencesOfString:(NSString*)str
-{
-    NSInteger count=0;
-    DOMRange *res=nil;
-    
+- (void)highlightAllOccurencesOfString:(NSString*)str update:(BOOL)update direction:(BOOL)forward
+{   
     if([[[[self mainFrame] DOMDocument] documentElement] isKindOfClass:[DOMHTMLElement class]]){
         DOMHTMLElement *dom=(DOMHTMLElement *)[[[self mainFrame] DOMDocument] documentElement];
-        if(![str isEqualToString:[dom getAttribute:@"searchStr"]]){
+        if(update){
             [self removeAllHighlights];
-            count=[self highlightAllOccurencesOfString:str inNode:dom];
-            if(count>0){
-                [dom setAttribute:@"searchStr" value:str];
-            }
+            [self highlightAllOccurencesOfString:str inNode:dom];
         }
-        if([self searchFor:str direction:YES caseSensitive:NO wrap:YES]){
-            res=[self selectedDOMRange];
+        if([self searchFor:str direction:forward caseSensitive:NO wrap:YES]){
+            result=[self selectedDOMRange];
         }
     }
-    
-    return res;
 }
 
-- (void)updateSearch:(NSSearchField *)sender
+- (void)search:(NSSearchField *)sender update:(BOOL)update direction:(BOOL)forward
 {
     NSString *searchString = [sender stringValue];
+        
     DLog(@"searchString:%@",searchString);
-    
-    DOMRange *selection;
-    
+       
     // Back-up the search field's caret position so we can restore it later
     NSRange searchFieldSelectedRange = [[sender currentEditor] selectedRange];
     
     if([searchString length]>0){
-        selection=[self highlightAllOccurencesOfString:searchString];
+        [self highlightAllOccurencesOfString:searchString update:update direction:forward];
         
         // Bring the search field back in focus and restore its caret position
         [[sender window] makeFirstResponder:sender];
         [[sender currentEditor] setSelectedRange:searchFieldSelectedRange];
         
-        if(selection!=nil)
-            [self setSelectedDOMRange:selection affinity:NSSelectionAffinityDownstream];
+        if(result!=nil) {
+            [self setSelectedDOMRange:result affinity:NSSelectionAffinityDownstream];
+        }
     }else{
         [self removeAllHighlights];
     }
@@ -119,6 +115,7 @@
 
 - (void)removeAllHighlights
 {
+    resultCount = 0;
     if([[[[self mainFrame] DOMDocument] documentElement] isKindOfClass:[DOMHTMLElement class]]){
         DOMHTMLElement *dom=(DOMHTMLElement *)[[[self mainFrame] DOMDocument] documentElement];
         [self removeAllHighlights:dom];

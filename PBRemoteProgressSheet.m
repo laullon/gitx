@@ -287,6 +287,7 @@ static PBGitRepository *repository;
 	[info appendString:[self standardOutputDescription]];
 
     [(NSWindowController<Messages>*)controller showMessageSheet:[self successTitle] infoText:info];
+    [NSApp cancelUserAttentionRequest: NSCriticalRequest];
 }
 
 

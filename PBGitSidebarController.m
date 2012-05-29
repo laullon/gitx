@@ -163,24 +163,32 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 			[self performSelectorInBackground:@selector(evaluateRemoteBadge:) withObject:remote];
 		}
 		
-		for(PBGitSVBranchItem* branch in [branches children]){
-			if([branch isKindOfClass:[PBGitSVBranchItem class]]){
-				NSString *bName=[branch title];
-				dispatch_async(PBGetWorkQueue(),^{
-					id ahead = [self countCommintsOf:[NSString stringWithFormat:@"origin/%@..%@",bName,bName]]; 
-					id behind = [self countCommintsOf:[NSString stringWithFormat:@"%@..origin/%@",bName,bName]];
-					dispatch_async(dispatch_get_main_queue(),^{
-						[branch setAhead:ahead];
-						[branch setBehind:behind];
-						[branch setIsCheckedOut:[branch.revSpecifier isEqual:[repository headRef]]];
-					});
-				});
-			}
-		}
+		[self updateMetaDataforBranches:branches];
 	}else{
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
 }
+
+
+-(void)updateMetaDataforBranches:(PBSourceViewItem *)theBranches
+{
+    for(PBGitSVBranchItem* branch in [theBranches children]){
+        if([branch isKindOfClass:[PBGitSVBranchItem class]]){
+            dispatch_async(PBGetWorkQueue(),^{
+                id ahead = [self countCommintsOf:[NSString stringWithFormat:@"origin/%@..%@",branch.revSpecifier,branch.revSpecifier]]; 
+                id behind = [self countCommintsOf:[NSString stringWithFormat:@"%@..origin/%@",branch.revSpecifier,branch.revSpecifier]];
+                dispatch_async(dispatch_get_main_queue(),^{
+                    [branch setAhead:ahead];
+                    [branch setBehind:behind];
+                    [branch setIsCheckedOut:[branch.revSpecifier isEqual:[repository headRef]]];
+                });
+            });
+        }else if ([branch isKindOfClass:[PBGitSVFolderItem class]]) {
+            [self updateMetaDataforBranches: branch];
+        }
+    }
+}
+
 
 #pragma mark Badges Methods
 

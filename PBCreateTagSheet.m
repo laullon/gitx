@@ -69,7 +69,7 @@ static PBCreateTagSheet *sheet;
 	}
     
     NSString *refExistsReturnMessage;
-    if([self.repository refExists:ref checkOnRemotesWithoutBranches:YES resultMessage:&refExistsReturnMessage])
+    if([self.repository refExists:ref checkOnRemotesWithoutBranches:NO resultMessage:&refExistsReturnMessage])
     {
         NSError  *error = [NSError errorWithDomain:PBGitRepositoryErrorDomain 
                                               code:0
