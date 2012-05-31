@@ -95,13 +95,13 @@
 
 	// Unstaged changes
 	if ([table tag] == 0) {
-		NSMenuItem *stageItem = [[NSMenuItem alloc] initWithTitle:@"Stage Changes" action:@selector(stageFilesAction:) keyEquivalent:@""];
+		NSMenuItem *stageItem = [[NSMenuItem alloc] initWithTitle:@"Stage Changes" action:@selector(stageFilesAction:) keyEquivalent:@"s"];
 		[stageItem setTarget:self];
 		[stageItem setRepresentedObject:selectedFiles];
 		[menu addItem:stageItem];
 	}
 	else if ([table tag] == 1) {
-		NSMenuItem *unstageItem = [[NSMenuItem alloc] initWithTitle:@"Unstage Changes" action:@selector(unstageFilesAction:) keyEquivalent:@""];
+		NSMenuItem *unstageItem = [[NSMenuItem alloc] initWithTitle:@"Unstage Changes" action:@selector(unstageFilesAction:) keyEquivalent:@"u"];
 		[unstageItem setTarget:self];
 		[unstageItem setRepresentedObject:selectedFiles];
 		[menu addItem:unstageItem];
@@ -167,6 +167,17 @@
 	
 	return menu;
 }
+
+- (void) stageSelectedFiles
+{
+	[commitController.index stageFiles:[unstagedFilesController selectedObjects]];
+}
+
+- (void) unstageSelectedFiles
+{
+	[commitController.index unstageFiles:[stagedFilesController selectedObjects]];
+}
+
 
 - (void) stageFilesAction:(id) sender
 {

@@ -23,4 +23,8 @@
 - (IBAction) tableClicked:(NSTableView *)tableView;
 
 - (NSMenu *) menuForTable:(NSTableView *)table;
+
+- (void) stageSelectedFiles;
+- (void) unstageSelectedFiles;
+
 @end
