@@ -1257,8 +1257,8 @@ dispatch_queue_t PBGetWorkQueue() {
 	NSArray *arguments = [NSArray arrayWithObjects:@"cherry-pick", refName, nil];
 	NSString *output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
 	if (retValue) {
-		NSString *message = [NSString stringWithFormat:@"There was an error cherry picking the %@ '%@'.\n\nPerhaps your working directory is not clean?", [ref refishType], [ref shortName]];
-		[self.windowController showErrorSheetTitle:@"Cherry pick failed!" message:message arguments:arguments output:output];
+		NSString *message = [NSString stringWithFormat:@"There was an error cherry-picking the %@ '%@'.\n\nPerhaps your working directory is not clean?", [ref refishType], [ref shortName]];
+		[self.windowController showErrorSheetTitle:@"Cherry-picking failed!" message:message arguments:arguments output:output];
 		return NO;
 	}
 
@@ -1284,7 +1284,7 @@ dispatch_queue_t PBGetWorkQueue() {
 		if (branch)
 			branchName = [NSString stringWithFormat:@"%@ '%@'", [branch refishType], [branch shortName]];
 		NSString *message = [NSString stringWithFormat:@"There was an error rebasing %@ with %@ '%@'.", branchName, [upstream refishType], [upstream shortName]];
-		[self.windowController showErrorSheetTitle:@"Rebase failed!" message:message arguments:arguments output:output];
+		[self.windowController showErrorSheetTitle:@"Rebasing failed!" message:message arguments:arguments output:output];
 		return NO;
 	}
 
@@ -1303,7 +1303,7 @@ dispatch_queue_t PBGetWorkQueue() {
 	NSString *output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
 	if (retValue) {
 		NSString *message = [NSString stringWithFormat:@"There was an error creating the branch '%@' at %@ '%@'.", branchName, [ref refishType], [ref shortName]];
-		[self.windowController showErrorSheetTitle:@"Create Branch failed!" message:message arguments:arguments output:output];
+		[self.windowController showErrorSheetTitle:@"Branch creation failed!" message:message arguments:arguments output:output];
 		return NO;
 	}
 
@@ -1340,7 +1340,7 @@ dispatch_queue_t PBGetWorkQueue() {
         output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
         if (gitRetValue) {
             NSString *message = [NSString stringWithFormat:@"There was an error renaming '%@ %@' to '%@'.", [ref refishType], [ref shortName], newName];
-            [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+            [self.windowController showErrorSheetTitle:@"Renaming failed!" message:message arguments:arguments output:output];
             retValue = NO;
         }
         
@@ -1363,7 +1363,7 @@ dispatch_queue_t PBGetWorkQueue() {
             output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
             if (gitRetValue) {
                 NSString *message = [NSString stringWithFormat:@"There was an error checking out remotebranch %@ for renaming.", [ref shortName]];
-                [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+                [self.windowController showErrorSheetTitle:@"Renaming failed!" message:message arguments:arguments output:output];
                 retValue = NO;
             }
             else
@@ -1379,7 +1379,7 @@ dispatch_queue_t PBGetWorkQueue() {
             output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
             if (gitRetValue) {
                 NSString *message = [NSString stringWithFormat:@"There was an error creating the new local branch %@.", newName];
-                [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+                [self.windowController showErrorSheetTitle:@"Renamining failed!" message:message arguments:arguments output:output];
                 retValue = NO;
             }
         }
@@ -1391,7 +1391,7 @@ dispatch_queue_t PBGetWorkQueue() {
             output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
             if (gitRetValue) {
                 NSString *message = [NSString stringWithFormat:@"There was an error pushing the new local branch %@ to the remote %@.", newName, [ref remoteName]];
-                [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+                [self.windowController showErrorSheetTitle:@"Renaming failed!" message:message arguments:arguments output:output];
                 retValue = NO;
             }
         }
@@ -1408,7 +1408,7 @@ dispatch_queue_t PBGetWorkQueue() {
         output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
         if (gitRetValue) {
             NSString *message = [NSString stringWithFormat:@"There was an error renaming %@ %@ to %@.", [ref refishType], [ref shortName], newName];
-            [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+            [self.windowController showErrorSheetTitle:@"Renaming failed!" message:message arguments:arguments output:output];
             retValue = NO;
         }
     }
@@ -1419,7 +1419,7 @@ dispatch_queue_t PBGetWorkQueue() {
         output = [self outputInWorkdirForArguments:arguments retValue:&gitRetValue];
         if (gitRetValue) {
             NSString *message = [NSString stringWithFormat:@"There was an error returning to Head %@.",actHeadSHA];
-            [self.windowController showErrorSheetTitle:@"Rename failed!" message:message arguments:arguments output:output];
+            [self.windowController showErrorSheetTitle:@"Renaming failed!" message:message arguments:arguments output:output];
             retValue = NO;
         }
     }
@@ -1458,7 +1458,7 @@ dispatch_queue_t PBGetWorkQueue() {
 		if (target)
 			targetName = [NSString stringWithFormat:@"%@ '%@'", [target refishType], [target shortName]];
 		NSString *message = [NSString stringWithFormat:@"There was an error creating the tag '%@' at %@.", tagName, targetName];
-		[self.windowController showErrorSheetTitle:@"Create Tag failed!" message:message arguments:arguments output:output];
+		[self.windowController showErrorSheetTitle:@"Tag creation failed!" message:message arguments:arguments output:output];
 		return NO;
 	}
 
