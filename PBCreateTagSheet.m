@@ -26,6 +26,7 @@
 @synthesize tagNameField;
 @synthesize tagMessageText;
 @synthesize errorMessageField;
+@synthesize replaceExisting;
 
 static PBCreateTagSheet *sheet;
 
@@ -69,13 +70,13 @@ static PBCreateTagSheet *sheet;
 	}
     
     NSString *refExistsReturnMessage;
-    if([self.repository refExists:ref checkOnRemotesWithoutBranches:NO resultMessage:&refExistsReturnMessage])
+    if(!self.replaceExisting && [self.repository refExists:ref checkOnRemotesWithoutBranches:NO resultMessage:&refExistsReturnMessage])
     {
         NSError  *error = [NSError errorWithDomain:PBGitRepositoryErrorDomain 
                                               code:0
                                           userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
                                                     refExistsReturnMessage, NSLocalizedDescriptionKey,
-                                                    @"Select other tagname.", NSLocalizedRecoverySuggestionErrorKey,
+                                                    @"Enter another tag name.", NSLocalizedRecoverySuggestionErrorKey,
                                                     nil]
                            ];
         [[NSAlert alertWithError:error]runModal];
@@ -89,7 +90,7 @@ static PBCreateTagSheet *sheet;
                                                 defaultButton:@"Yes"
                                               alternateButton:@"No"
                                                   otherButton:nil
-                                    informativeTextWithFormat:@"Still want to create the %@ %@?",[ref refishType],[ref shortName]] runModal];
+                                    informativeTextWithFormat:@"Do you still want to create the %@ %@?",[ref refishType],[ref shortName]] runModal];
             
             if (returnButton == NSAlertAlternateReturn)
             {
@@ -101,7 +102,7 @@ static PBCreateTagSheet *sheet;
 	[self closeCreateTagSheet:sender];
 
 	NSString *message = [self.tagMessageText string];
-	[self.repository createTag:tagName message:message atRefish:self.targetRefish];
+	[self.repository createTag:tagName message:message atRefish:self.targetRefish force:self.replaceExisting];
 }
 
 

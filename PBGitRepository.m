@@ -186,13 +186,13 @@ dispatch_queue_t PBGetWorkQueue() {
 {
 	config = [[PBGitConfig alloc] initWithRepositoryPath:[[self fileURL] path]];
 	self.branches = [NSMutableArray array];
-	[self reloadRefs];
 	currentBranchFilter = [PBGitDefaults branchFilter];
 	revisionList = [[PBGitHistoryList alloc] initWithRepository:self];
-	
 	resetController = [[PBGitResetController alloc] initWithRepository:self];
 	stashController = [[PBStashController alloc] initWithRepository:self];
 	submoduleController = [[PBSubmoduleController alloc] initWithRepository:self];
+    [self reloadRefs];
+    [self readCurrentBranch];
 }
 
 - (void)close
@@ -614,7 +614,7 @@ dispatch_queue_t PBGetWorkQueue() {
     {
         if (result)
         {
-            *result = [NSString stringWithFormat:@"%@ exists already local as branch!",refShortName];
+            *result = [NSString stringWithFormat:@"%@ already exists as local branch!",refShortName];
         }
         return YES;
     }
@@ -626,7 +626,7 @@ dispatch_queue_t PBGetWorkQueue() {
     {
         if (result)
         {
-            *result = [NSString stringWithFormat:@"%@ exists already local as tag!",refShortName];
+            *result = [NSString stringWithFormat:@"%@ already exists as local tag!",refShortName];
         }
         return YES;
     }
@@ -637,7 +637,7 @@ dispatch_queue_t PBGetWorkQueue() {
     {
         if (result)
         {
-            *result = [NSString stringWithFormat:@"%@ exists already local as remotename!",refShortName];
+            *result = [NSString stringWithFormat:@"%@ already exists as remote reference!",refShortName];
         }
         return YES;
     }
@@ -1428,7 +1428,7 @@ dispatch_queue_t PBGetWorkQueue() {
     return retValue;
 }
 
-- (BOOL) createTag:(NSString *)tagName message:(NSString *)message atRefish:(id <PBGitRefish>)target
+- (BOOL) createTag:(NSString *)tagName message:(NSString *)message atRefish:(id <PBGitRefish>)target force:(BOOL)force
 {
 	if (!tagName)
 		return NO;
@@ -1441,6 +1441,10 @@ dispatch_queue_t PBGetWorkQueue() {
 		[arguments addObject:[@"-m" stringByAppendingString:message]];
 	}
 
+    if (force) {
+        [arguments addObject:@"-f"];
+    }
+    
 	[arguments addObject:tagName];
 
 	// if no refish then git will add it to HEAD

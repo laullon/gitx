@@ -60,7 +60,7 @@
 		[items addObject:[PBRefMenuItem itemWithTitle:checkoutTitle action:@selector(checkout:) enabled:!isHead]];
 		[items addObject:[PBRefMenuItem separatorItem]];
 
-        NSString *resetTitle = [NSString stringWithFormat:@"Reset %@ to %@", headRefName, targetRefName];
+        NSString *resetTitle = [NSString stringWithFormat:@"Reset %@ to %@…", headRefName, targetRefName];
         [items addObject:[PBRefMenuItem itemWithTitle: resetTitle action:@selector(reset:) enabled:YES]];
         [items addObject:[PBRefMenuItem separatorItem]];       
         
@@ -172,7 +172,7 @@
 	[items addObject:[PBRefMenuItem itemWithTitle:@"Checkout Commit" action:@selector(checkout:) enabled:YES]];
 	[items addObject:[PBRefMenuItem separatorItem]];
     
-    NSString *resetTitle = [NSString stringWithFormat:@"Reset %@ to here", headBranchName];
+    NSString *resetTitle = [NSString stringWithFormat:@"Reset %@ to here…", headBranchName];
     [items addObject:[PBRefMenuItem itemWithTitle: resetTitle action:@selector(reset:) enabled:YES]];
 	[items addObject:[PBRefMenuItem separatorItem]];
 

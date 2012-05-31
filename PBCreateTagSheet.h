@@ -34,5 +34,6 @@
 @property (strong) IBOutlet NSTextField *tagNameField;
 @property (strong) IBOutlet NSTextView  *tagMessageText;
 @property (strong) IBOutlet NSTextField *errorMessageField;
+@property (assign) BOOL replaceExisting;
 
 @end

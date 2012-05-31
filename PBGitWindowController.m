@@ -135,7 +135,6 @@
     
 	[self setNextResponder: contentController];
 	[[self window] makeFirstResponder:[contentController firstResponder]];
-	[contentController updateView];
 	[contentController addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:@"statusChange"];
 }
 

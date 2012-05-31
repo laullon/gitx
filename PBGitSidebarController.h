@@ -46,7 +46,7 @@
 
 - (void)setHistorySearch:(NSString *)searchString mode:(NSInteger)mode;
 
--(NSNumber *)countCommintsOf:(NSString *)range;
+-(NSNumber *)countCommitsOf:(NSString *)range;
 -(bool)remoteNeedFetch:(NSString *)remote;
 
 @property(strong, readonly) NSMutableArray *items;

@@ -68,21 +68,26 @@ DOMRange *result=nil;
     }
 }
 
-- (void)search:(NSSearchField *)sender update:(BOOL)update direction:(BOOL)forward
+- (void)search:(NSSearchField *)sender update:(BOOL)update grabFocus:(BOOL)grabFocus direction:(BOOL)forward
 {
     NSString *searchString = [sender stringValue];
         
     DLog(@"searchString:%@",searchString);
-       
-    // Back-up the search field's caret position so we can restore it later
-    NSRange searchFieldSelectedRange = [[sender currentEditor] selectedRange];
+    
+    NSRange searchFieldSelectedRange;
+    if (grabFocus) {
+        // Back-up the search field's caret position so we can restore it later
+        searchFieldSelectedRange = [[sender currentEditor] selectedRange];
+    }
     
     if([searchString length]>0){
         [self highlightAllOccurencesOfString:searchString update:update direction:forward];
         
-        // Bring the search field back in focus and restore its caret position
-        [[sender window] makeFirstResponder:sender];
-        [[sender currentEditor] setSelectedRange:searchFieldSelectedRange];
+        if (grabFocus) {
+            // Bring the search field back in focus and restore its caret position
+            [[sender window] makeFirstResponder:sender];
+            [[sender currentEditor] setSelectedRange:searchFieldSelectedRange];
+        }
         
         if(result!=nil) {
             [self setSelectedDOMRange:result affinity:NSSelectionAffinityDownstream];

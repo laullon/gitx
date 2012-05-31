@@ -84,6 +84,7 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 	
 	[sourceView setDoubleAction:@selector(outlineDoubleClicked)];
 	[sourceView setTarget:self];
+    [self updateMetaDataForBranches];
 }
 
 - (void)closeView
@@ -162,21 +163,20 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 		for(PBGitSVRemoteItem* remote in [remotes children]){
 			[self performSelectorInBackground:@selector(evaluateRemoteBadge:) withObject:remote];
 		}
-		
-		[self updateMetaDataforBranches:branches];
+		[self updateMetaDataForBranches];
 	}else{
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
 }
 
 
--(void)updateMetaDataforBranches:(PBSourceViewItem *)theBranches
+-(void)updateMetaDataForBranches:(PBSourceViewItem *)theBranches
 {
     for(PBGitSVBranchItem* branch in [theBranches children]){
         if([branch isKindOfClass:[PBGitSVBranchItem class]]){
             dispatch_async(PBGetWorkQueue(),^{
-                id ahead = [self countCommintsOf:[NSString stringWithFormat:@"origin/%@..%@",branch.revSpecifier,branch.revSpecifier]]; 
-                id behind = [self countCommintsOf:[NSString stringWithFormat:@"%@..origin/%@",branch.revSpecifier,branch.revSpecifier]];
+                id ahead = [self countCommitsOf:[NSString stringWithFormat:@"origin/%@..%@",branch.revSpecifier,branch.revSpecifier]]; 
+                id behind = [self countCommitsOf:[NSString stringWithFormat:@"%@..origin/%@",branch.revSpecifier,branch.revSpecifier]];
                 dispatch_async(dispatch_get_main_queue(),^{
                     [branch setAhead:ahead];
                     [branch setBehind:behind];
@@ -184,11 +184,15 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
                 });
             });
         }else if ([branch isKindOfClass:[PBGitSVFolderItem class]]) {
-            [self updateMetaDataforBranches: branch];
+            [self updateMetaDataForBranches: branch];
         }
     }
 }
 
+-(void)updateMetaDataForBranches
+{
+    [self updateMetaDataForBranches: branches];
+}
 
 #pragma mark Badges Methods
 
@@ -205,7 +209,7 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 	}
 }
 
--(NSNumber *)countCommintsOf:(NSString *)range
+-(NSNumber *)countCommitsOf:(NSString *)range
 {
 	NSArray *args = [NSArray arrayWithObjects:@"rev-list", range, nil];
 	int ret;
