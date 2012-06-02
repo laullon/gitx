@@ -193,72 +193,6 @@ a.showdiff {
 	background-color: #fca64f;
 }
 
-#filelist {
-	font-size: 13px;
-	white-space: nowrap;
-	width: 100%;
-	padding: 10px 20px;
-	border-collapse: collapse;
-}
-
-#filelist tr td {
-	border-bottom: 1px solid #ccc;
-	border-top: 1px solid #ccc;
-}
-
-#filelist a {
-	margin-left: 10px;
-	padding-left: 20px;
-	text-decoration: none;
-}
-
-#filelist a:hover {
-	text-decoration: underline;
-}
-
-#filelist a.A {
-	background: url(../../images/added.png) no-repeat 0 center;
-}
-
-#filelist a.D {
-	background: url(../../images/removed.png) no-repeat 0 center;
-}
-
-#filelist a.M {
-	background: url(../../images/modified.png) no-repeat 0 center;
-}
-
-#filelist a.R,#filelist a.C {
-	background: url(../../images/renamed.png) no-repeat 0 center;
-}
-
-#filelist span.add,#filelist span.rem {
-	display: block;
-	height: 10px;
-	border-top-left-radius: 5px;
-	border-bottom-left-radius: 5px;
-	float: right;
-	clear: both;
-}
-
-#filelist span.add {
-	background-color: rgba(0, 255, 0, 0.199219);
-}
-
-#filelist span.rem {
-	background-color: rgba(255, 0, 0, 0.199219);
-}
-
-#filelist td.bar {
-	width: 50%;
-	display: block;
-}
-
-#filelist td.add,#filelist td.rem {
-	width: 1%;
-	text-align: right;
-}
-
 #header {
 	font-size: 13px;
 	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(.7, #EAF2f6), color-stop(1, #e3ebf3));
@@ -316,19 +250,6 @@ a.showdiff {
 	float: left;
 	margin: 5px;
 	padding-bottom: 5px;
-}
-
-#diffs {
-	width: 100%;
-	display: block;
-	padding-top: 10px;
-	overflow: auto;
-}
-
-#diffs table.diff {
-	-webkit-box-shadow:3px 3px 3px #ccc;
-	width: 98%;
-	margin: auto auto 20px 1%;
 }
 
 .filemerge {

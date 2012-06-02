@@ -1,10 +1,26 @@
+body {
+	margin: 0;
+	padding: 0;
+}
+
+#diffs {
+	width: 100%;
+	display: block;
+	overflow: auto;
+}
+
+#diff {
+	display: block;
+	overflow: auto;
+}
+
 table.diff {
 	font-family: Menlo, Consolas, 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
 	border: 1px solid #8f8f8f;
-	width: 100%;
 	border-collapse: collapse;
-	margin-bottom: 10px;
-	-webkit-box-shadow: 5px 5px 5px #ccc;
+	-webkit-box-shadow:3px 3px 3px #ccc;
+	width: 98%;
+	margin: auto auto 20px 1%;
 }
 
 table.diff tr td {
@@ -65,13 +81,69 @@ table.diff .filemerge {
 	text-align: center;
 }
 
-#diff {
+#filelist {
+	font-size: 13px;
+	white-space: nowrap;
 	width: 100%;
-	display: block;
-	overflow: auto;
+	padding: 0 20px;
+	border-collapse: collapse;
+    margin-bottom: 10px;
 }
 
-#diff table.diff {
-	width: 98%;
-	margin: auto auto 20px 1%;
+#filelist tr td {
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+}
+
+#filelist a {
+	margin-left: 10px;
+	padding-left: 20px;
+	text-decoration: none;
+}
+
+#filelist a:hover {
+	text-decoration: underline;
+}
+
+#filelist a.A {
+	background: url(../../images/added.png) no-repeat 0 center;
+}
+
+#filelist a.D {
+	background: url(../../images/removed.png) no-repeat 0 center;
+}
+
+#filelist a.M {
+	background: url(../../images/modified.png) no-repeat 0 center;
+}
+
+#filelist a.R,#filelist a.C {
+	background: url(../../images/renamed.png) no-repeat 0 center;
+}
+
+#filelist span.add,#filelist span.rem {
+	display: block;
+	height: 10px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	float: right;
+	clear: both;
+}
+
+#filelist span.add {
+	background-color: rgba(0, 255, 0, 0.199219);
+}
+
+#filelist span.rem {
+	background-color: rgba(255, 0, 0, 0.199219);
+}
+
+#filelist td.bar {
+	width: 50%;
+	display: block;
+}
+
+#filelist td.add,#filelist td.rem {
+	width: 1%;
+	text-align: right;
 }

@@ -17,6 +17,7 @@
 #define kConfirmPublicGists @"PBConfirmPublicGists"
 #define kPublicGist @"PBGistPublic"
 #define kShowWhitespaceDifferences @"PBShowWhitespaceDifferences"
+#define kEnableSignOff @"PBEnableSignoff"
 #define kRefreshAutomatically @"PBRefreshAutomatically"
 #define kUseAskPasswd @"PBUseAskPasswd"
 #define kOpenCurDirOnLaunch @"PBOpenCurDirOnLaunch"
@@ -52,6 +53,8 @@
 					  forKey:kPublicGist];
 	[defaultValues setObject:[NSNumber numberWithBool:YES]
 					  forKey:kShowWhitespaceDifferences];
+    [defaultValues setObject:[NSNumber numberWithBool:NO]
+					  forKey:kEnableSignOff];
 	[defaultValues setObject:[NSNumber numberWithBool:YES]
 					  forKey:kRefreshAutomatically];
 	[defaultValues setObject:[NSNumber numberWithBool:YES]

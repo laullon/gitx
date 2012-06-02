@@ -254,10 +254,12 @@
 	if (isBusy) {
 		[progressIndicator startAnimation:self];
 		[progressIndicator setHidden:NO];
+        [statusField setTextColor:[NSColor blueColor]];
 	}
 	else {
 		[progressIndicator stopAnimation:self];
 		[progressIndicator setHidden:YES];
+        [statusField setTextColor:[NSColor blackColor]];
 	}
 }
 

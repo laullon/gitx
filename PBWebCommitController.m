@@ -12,9 +12,7 @@
 
 @interface PBWebCommitController (Private)
 
-- (NSArray *)parseHeader:(NSString *)text;
 - (NSString *)htmlForHeader:(NSArray *)header withRefs:(NSString *)badges;
-- (NSMutableDictionary *)parseStats:(NSString *)txt;
 - (NSString *) arbitraryHashForString:(NSString*)concat;
 
 @end
@@ -96,7 +94,7 @@ const NSString *kAuthorKeyDate = @"date";
             return;
         
         // Header
-        NSArray *headerItems = [self parseHeader:details];
+        NSArray *headerItems = [PBWebCommitController parseHeader:details];
         NSString *header = [self htmlForHeader:headerItems withRefs:[self refsForCurrentCommit]];
 
         // In case the commit is a merge, we need to explicity give diff-tree the
@@ -111,7 +109,7 @@ const NSString *kAuthorKeyDate = @"date";
         NSArray *parents = [self chooseDiffParents:allParents];
 
         // File Stats
-        NSMutableDictionary *stats = [self parseStats:details];
+        NSMutableDictionary *stats = [PBWebCommitController parseStats:details];
 
         // File list
         NSMutableArray *args = [NSMutableArray arrayWithObjects:@"diff-tree", @"--root", @"-r", @"-C90%", @"-M90%", nil];
@@ -132,7 +130,7 @@ const NSString *kAuthorKeyDate = @"date";
         {
             showLongDiffs = FALSE;
             NSString *diffs = [GLFileView parseDiff:d];
-            html = [NSString stringWithFormat:@"%@%@<div id='diffs'>%@</div>",header,fileList,diffs];
+            html = [NSString stringWithFormat:@"%@%@%@",header,fileList,diffs];
         } else {
             html = [NSString stringWithFormat:@"%@%@<div id='diffs'><p>This is a very large commit. It may take a long time to load the diff. Click <a href='' onclick='showFullDiff(); return false;'>here</a> to show anyway.</p></div>",header,fileList,currentSha];
         }
@@ -165,7 +163,7 @@ const NSString *kAuthorKeyDate = @"date";
 	return parents;
 }
 
-- (NSMutableDictionary *)parseStats:(NSString *)txt
++ (NSMutableDictionary *)parseStats:(NSString *)txt
 {
 	NSArray *lines = [txt componentsSeparatedByString:@"\n"];
 	NSMutableDictionary *stats=[NSMutableDictionary dictionary];
@@ -183,7 +181,7 @@ const NSString *kAuthorKeyDate = @"date";
 	return stats;
 }
 
-- (NSArray *)parseHeader:(NSString *)text
++ (NSArray *)parseHeader:(NSString *)text
 {
 	NSMutableArray *result = [NSMutableArray array];
 	NSArray *lines = [text componentsSeparatedByString:@"\n"];

@@ -27,6 +27,9 @@
 - (void) openFileMerge:(NSString*)file sha:(NSString *)sha sha2:(NSString *)sha2;
 - (void) showLongDiff;
 
++ (NSArray *)parseHeader:(NSString *)text;
++ (NSMutableDictionary *)parseStats:(NSString *)txt;
+
 - (void) didLoad;
 // Called when a commit or parent link is clicked.
 - (void)selectCommit:(NSString *)sha;

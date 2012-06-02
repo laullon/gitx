@@ -317,7 +317,7 @@
         [res appendString:[GLFileView parseDiffBlock:[NSString stringWithFormat:@"diff --%@",block]]];
     }
     
-    return res;
+    return [NSString stringWithFormat:@"<div id='diffs'>%@</div>",res];
 }
 
 + (NSString *)parseDiffBlock:(NSString *)txt

@@ -3,7 +3,7 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
 		<string key="IBDocument.SystemVersion">11D50</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2177</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
 		<string key="IBDocument.AppKitVersion">1138.32</string>
 		<string key="IBDocument.HIToolboxVersion">568.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
@@ -15,7 +15,7 @@
 			</object>
 			<object class="NSArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>2177</string>
+				<string>2182</string>
 				<string>1117</string>
 			</object>
 		</object>
@@ -376,7 +376,6 @@
 																				<string>Apple PNG pasteboard type</string>
 																				<string>Apple URL pasteboard type</string>
 																				<string>CorePasteboardFlavorType 0x6D6F6F76</string>
-																				<string>CorePasteboardFlavorType 0x75726C20</string>
 																				<string>NSColor pasteboard type</string>
 																				<string>NSFilenamesPboardType</string>
 																				<string>NSStringPboardType</string>
@@ -393,7 +392,7 @@
 																		<string key="NSFrame">{{0, 27}, {427, 14}}</string>
 																		<reference key="NSSuperview" ref="245211955"/>
 																		<reference key="NSWindow"/>
-																		<reference key="NSNextKeyView" ref="337880358"/>
+																		<reference key="NSNextKeyView" ref="20200144"/>
 																		<object class="NSTextContainer" key="NSTextContainer" id="311869542">
 																			<object class="NSLayoutManager" key="NSLayoutManager">
 																				<object class="NSTextStorage" key="NSTextStorage">
@@ -485,9 +484,7 @@
 																				<integer value="5"/>
 																				<object class="NSURL">
 																					<nil key="NS.base"/>
-																					<object class="NSMutableString" key="NS.relative">
-																						<characters key="NS.bytes">file://localhost/Applications/Xcode.app/Contents/SharedFrameworks/DVTKit.framework/Resources/DVTIbeamCursor.tiff</characters>
-																					</object>
+																					<string key="NS.relative">file://localhost/Applications/Xcode.app/Contents/SharedFrameworks/DVTKit.framework/Resources/DVTIbeamCursor.tiff</string>
 																				</object>
 																			</object>
 																		</object>
@@ -527,7 +524,7 @@
 														<string key="NSFrame">{{0, 36}, {429, 186}}</string>
 														<reference key="NSSuperview" ref="154221104"/>
 														<reference key="NSWindow"/>
-														<reference key="NSNextKeyView" ref="245211955"/>
+														<reference key="NSNextKeyView" ref="337880358"/>
 														<int key="NSsFlags">133650</int>
 														<reference key="NSVScroller" ref="20200144"/>
 														<reference key="NSHScroller" ref="337880358"/>
@@ -717,6 +714,7 @@
 																<string key="NSFrame">{{1, 247}, {256, 15}}</string>
 																<reference key="NSSuperview" ref="617511385"/>
 																<reference key="NSWindow"/>
+																<reference key="NSNextKeyView"/>
 																<int key="NSsFlags">1</int>
 																<reference key="NSTarget" ref="617511385"/>
 																<string key="NSAction">_doScroller:</string>
@@ -1126,6 +1124,26 @@
 					</object>
 					<int key="connectionID">269</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">hidden: values.PBEnableSignOff</string>
+						<reference key="source" ref="1042222292"/>
+						<reference key="destination" ref="58425690"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="1042222292"/>
+							<reference key="NSDestination" ref="58425690"/>
+							<string key="NSLabel">hidden: values.PBEnableSignOff</string>
+							<string key="NSBinding">hidden</string>
+							<string key="NSKeyPath">values.PBEnableSignOff</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSValueTransformerName</string>
+								<string key="NS.object.0">NSNegateBoolean</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">320</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1512,7 +1530,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">314</int>
+			<int key="maxID">320</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1748,14 +1766,6 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">PBGitRepository</string>
-					<string key="superclassName">NSDocument</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/PBGitRepository.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">PBIconAndTextCell</string>
 					<string key="superclassName">NSTextFieldCell</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -1840,35 +1850,14 @@
 					<string key="className">PBWebController</string>
 					<string key="superclassName">NSObject</string>
 					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>repository</string>
-							<string>view</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>PBGitRepository</string>
-							<string>WebView</string>
-						</object>
+						<string key="NS.key.0">view</string>
+						<string key="NS.object.0">WebView</string>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>repository</string>
-							<string>view</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">repository</string>
-								<string key="candidateClassName">PBGitRepository</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">view</string>
-								<string key="candidateClassName">WebView</string>
-							</object>
+						<string key="NS.key.0">view</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">view</string>
+							<string key="candidateClassName">WebView</string>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
