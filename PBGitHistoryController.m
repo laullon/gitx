@@ -248,16 +248,20 @@
 	}else if ([context isEqualToString:@"branchFilterChange"]) {
 		[PBGitDefaults setBranchFilter:repository.currentBranchFilter];
 		[self updateBranchFilterMatrix];
-	}else if([context isEqualToString:@"updateCommitCount"] || [(NSString *)context isEqualToString:@"revisionListUpdating"]) {
-		[self updateStatus];
-
-		if (selectedCommitBeforeRefresh && [repository commitForSHA:[selectedCommitBeforeRefresh sha]])
-			[self selectCommit:[selectedCommitBeforeRefresh sha]];
-		else if ([repository.currentBranch isSimpleRef])
-			[self selectCommit:[repository shaForRef:[repository.currentBranch ref]]];
-		else
-			[self selectCommit:[[self firstCommit] sha]];
-	}else{
+	}
+    else if([context isEqualToString:@"updateCommitCount"] || [(NSString *)context isEqualToString:@"revisionListUpdating"]) {
+        // Only refresh the selected commit when the revision list has finished graphing
+        if (isBusy && !repository.revisionList.isUpdating) {
+            if (selectedCommit && [repository commitForSHA:[selectedCommit sha]])
+                [self selectCommit:[selectedCommit sha]];
+            else if ([repository.currentBranch isSimpleRef])
+                [self selectCommit:[repository shaForRef:[repository.currentBranch ref]]];
+            else
+                [self selectCommit:[[self firstCommit] sha]];
+        }
+        [self updateStatus];
+	}
+    else{
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:ctx];
 	}
 
@@ -408,9 +412,7 @@
 
 - (IBAction) refresh:(id)sender
 {
-	selectedCommitBeforeRefresh = selectedCommit;
 	[repository forceUpdateRevisions];
-	selectedCommitBeforeRefresh = NULL;
 }
 
 - (void) updateView

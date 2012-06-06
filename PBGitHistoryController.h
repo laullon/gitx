@@ -48,7 +48,6 @@
 	PBGitTree *gitTree;
 	PBGitCommit *webCommit;
 	PBGitCommit *selectedCommit;
-	PBGitCommit *selectedCommitBeforeRefresh;
 }
 
 @property (unsafe_unretained) IBOutlet NSTreeController* treeController;
