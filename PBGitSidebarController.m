@@ -37,6 +37,7 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 - (void) removeRevSpec:(PBGitRevSpecifier *)rev;
 - (void) updateActionMenu;
 - (void) updateRemoteControls;
+- (void) updateMetaDataForBranches;
 @end
 
 @implementation PBGitSidebarController

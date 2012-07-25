@@ -13,7 +13,6 @@
 
 @property(readonly) int resultCount;
 
-- (void)highlightAllOccurencesOfString:(NSString*)str direction:(BOOL)forward;
 - (void)highlightAllOccurencesOfString:(NSString*)str inNode:(DOMNode *)node;
 - (void)removeAllHighlights;
 - (void)search:(NSSearchField *)sender update:(BOOL)update grabFocus:(BOOL)grabFocus direction:(BOOL)forward;

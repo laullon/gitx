@@ -20,6 +20,8 @@
 @interface GLFileView ()
 
 - (void)saveSplitViewPosition;
+- (void)updateSearch;
+- (void)updateSearchUI;
 + (NSString *)parseDiffBlock:(NSString *)txt;
 + (NSString *)parseDiffHeader:(NSString *)txt;
 + (NSString *)parseDiffChunk:(NSString *)txt;
