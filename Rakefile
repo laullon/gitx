@@ -1,4 +1,4 @@
-require 'ftools'
+require 'fileutils'
 
 target_locations = [
   File::expand_path("~/Applications/"),
