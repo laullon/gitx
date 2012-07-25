@@ -1601,6 +1601,7 @@ dispatch_queue_t PBGetWorkQueue() {
     {
 		return [self deleteRemote:ref];
     }
+/*
     else if ([ref refishType] == kGitXRemoteBranchType)
     {
 		[self deleteRemoteBranch:ref];
@@ -1612,7 +1613,7 @@ dispatch_queue_t PBGetWorkQueue() {
             [self deleteRemoteTag:ref];
         }
     }
-
+*/
 	int retValue = 1;
 	NSArray *arguments = [NSArray arrayWithObjects:@"update-ref", @"-d", [ref ref], nil];
 	NSString * output = [self outputForArguments:arguments retValue:&retValue];
