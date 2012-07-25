@@ -273,6 +273,10 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 	[sourceView PBExpandItem:item expandParents:YES];
 	NSIndexSet *index = [NSIndexSet indexSetWithIndex:[sourceView rowForItem:item]];
 	
+    // Select the corresponding commit in the history view
+    if ([rev isSimpleRef])
+        [historyViewController selectCommit:[repository shaForRef:[rev ref]]];
+    
 	[sourceView selectRowIndexes:index byExtendingSelection:NO];
 }
 

@@ -107,13 +107,13 @@
 		[menu addItem:unstageItem];
 	}
 
-	NSString *openTitle = [selectedFiles count] == 1 ? @"Open file" : @"Open files";
+	NSString *openTitle = [selectedFiles count] == 1 ? @"Open File" : @"Open Files";
 	NSMenuItem *openItem = [[NSMenuItem alloc] initWithTitle:openTitle action:@selector(openFilesAction:) keyEquivalent:@""];
 	[openItem setTarget:self];
 	[openItem setRepresentedObject:selectedFiles];
 	[menu addItem:openItem];
 
-    NSString *deleteTitle = [selectedFiles count] == 1 ? @"Delete file…" : @"Delete files…";
+    NSString *deleteTitle = [selectedFiles count] == 1 ? @"Delete File…" : @"Delete Files…";
 	NSMenuItem *deleteItem = [[NSMenuItem alloc] initWithTitle:deleteTitle action:@selector(showDeleteFilesSheet:) keyEquivalent:@""];
 	[deleteItem setTarget:self];
 	[deleteItem setRepresentedObject:selectedFiles];
@@ -131,7 +131,7 @@
 			NSString *path = [[selectedFiles objectAtIndex:0] path];
 			NSString *extension = [path pathExtension];
 			if ([extension length] > 0) {
-				ignoreText = [NSString stringWithFormat:@"Ignore Files with extension (.%@)", extension];
+				ignoreText = [NSString stringWithFormat:@"Ignore Files with Extension (.%@)", extension];
 				ignoreItem = [[NSMenuItem alloc] initWithTitle:ignoreText action:@selector(ignoreFilesWithExtensionAction:) keyEquivalent:@""];
 				[ignoreItem setTarget:self];
 				[ignoreItem setRepresentedObject:extension];
@@ -151,14 +151,14 @@
 		if (!file.hasUnstagedChanges)
 			return menu;
 
-	NSMenuItem *discardItem = [[NSMenuItem alloc] initWithTitle:@"Discard changes…" action:@selector(discardFilesAction:) keyEquivalent:@""];
+	NSMenuItem *discardItem = [[NSMenuItem alloc] initWithTitle:@"Discard Changes…" action:@selector(discardFilesAction:) keyEquivalent:@""];
 	[discardItem setTarget:self];
 	[discardItem setAlternate:NO];
 	[discardItem setRepresentedObject:selectedFiles];
 
 	[menu addItem:discardItem];
 
-	NSMenuItem *discardForceItem = [[NSMenuItem alloc] initWithTitle:@"Discard changes" action:@selector(forceDiscardFilesAction:) keyEquivalent:@""];
+	NSMenuItem *discardForceItem = [[NSMenuItem alloc] initWithTitle:@"Discard Changes" action:@selector(forceDiscardFilesAction:) keyEquivalent:@""];
 	[discardForceItem setTarget:self];
 	[discardForceItem setAlternate:YES];
 	[discardForceItem setRepresentedObject:selectedFiles];
@@ -214,11 +214,16 @@
 - (void)showDeleteFilesSheet:(id)sender
 {
 	NSArray *files = [sender representedObject];
-    NSMutableString *filesPathsString = [[NSMutableString alloc] init];
-    
-    for (PBChangedFile *file in files) {
-        [filesPathsString appendString:[file path]];
-        [filesPathsString appendString:@"\n"];
+
+    NSString *messageText;
+    NSString *informativeText;
+    if ([files count] > 1) {
+        messageText = [NSString stringWithFormat:@"Delete %d files?",[files count]];
+        informativeText = [NSString stringWithFormat:@"Are you sure you want to move the selected %d files to the trash?\n\nYou cannot undo this operation.",[files count]];
+    }
+    else {
+        messageText = @"Delete file?";
+        informativeText = [NSString stringWithFormat:@"Are you sure you want to move the file \"%@\" to the trash?\n\nYou cannot undo this operation.",[[[files objectAtIndex:0] path] lastPathComponent]];
     }
     
     if ([PBGitDefaults isDialogWarningSuppressedForDialog:kDialogDeleteFiles]) {
@@ -226,11 +231,11 @@
 		return;
 	}
     
-	NSAlert *alert = [NSAlert alertWithMessageText:[NSString stringWithFormat:@"Delete files?"]
+	NSAlert *alert = [NSAlert alertWithMessageText:messageText
 									 defaultButton:@"Delete"
 								   alternateButton:@"Cancel"
 									   otherButton:nil
-						 informativeTextWithFormat:@"Are you sure you want to move the following files to the trash?\n\n%@\nYou cannot undo this operation.", filesPathsString];
+						 informativeTextWithFormat:informativeText];
     [alert setShowsSuppressionButton:YES];
 	
 	[alert beginSheetModalForWindow:[[commitController view] window]

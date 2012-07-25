@@ -14,13 +14,32 @@ body {
 	overflow: auto;
 }
 
-table.diff {
-	font-family: Menlo, Consolas, 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
-	border: 1px solid #8f8f8f;
+.diff-header, .diff-body {
+    font-family: Menlo, Consolas, 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
 	border-collapse: collapse;
+    border-style: solid;
+    border-color: #8f8f8f;
 	-webkit-box-shadow:3px 3px 3px #ccc;
 	width: 98%;
+    overflow: auto;
+}
+
+.diff-header {
+    border-width: 1px 1px 0 1px;
+	margin: auto auto 0 1%;
+}
+
+.diff-body {
+    border-width: 0 1px 1px 1px;
 	margin: auto auto 20px 1%;
+}
+
+.diff-header table.diff {
+    width: 100%;
+}
+
+table.diff {
+	border-collapse: collapse;
 }
 
 table.diff tr td {
@@ -34,9 +53,9 @@ table.diff td.code {
 	width: 100%;
 	border-left: 2px solid #d0d0d0;
 }
-
+    
 table.diff tr.header td {
-	border: 1px solid #8f8f8f;
+	border-bottom: 1px solid #8f8f8f;
 	padding: 5px;
 }
 

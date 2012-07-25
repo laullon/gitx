@@ -60,7 +60,7 @@
 		[items addObject:[PBRefMenuItem itemWithTitle:checkoutTitle action:@selector(checkout:) enabled:!isHead]];
 		[items addObject:[PBRefMenuItem separatorItem]];
 
-        NSString *resetTitle = [NSString stringWithFormat:@"Reset %@ To %@…", headRefName, targetRefName];
+        NSString *resetTitle = [NSString stringWithFormat:@"Reset %@ to %@…", headRefName, targetRefName];
         [items addObject:[PBRefMenuItem itemWithTitle: resetTitle action:@selector(reset:) enabled:YES]];
         [items addObject:[PBRefMenuItem separatorItem]];       
         
@@ -76,16 +76,16 @@
 			[items addObject:[PBRefMenuItem itemWithTitle:@"View Tag Info…" action:@selector(showTagInfoSheet:) enabled:YES]];
 
 		// Diff
-		NSString *diffTitle = [NSString stringWithFormat:@"Diff With %@", headRefName];
+		NSString *diffTitle = [NSString stringWithFormat:@"Diff with %@", headRefName];
 		[items addObject:[PBRefMenuItem itemWithTitle:diffTitle action:@selector(diffWithHEAD:) enabled:!isHead]];
 		[items addObject:[PBRefMenuItem separatorItem]];
 
 		// merge ref
-		NSString *mergeTitle = isOnHeadBranch ? @"Merge" : [NSString stringWithFormat:@"Merge %@ Into %@", targetRefName, headRefName];
+		NSString *mergeTitle = isOnHeadBranch ? @"Merge" : [NSString stringWithFormat:@"Merge %@ into %@", targetRefName, headRefName];
 		[items addObject:[PBRefMenuItem itemWithTitle:mergeTitle action:@selector(merge:) enabled:!isOnHeadBranch]];
 
 		// rebase
-		NSString *rebaseTitle = isOnHeadBranch ? @"Rebase" : [NSString stringWithFormat:@"Rebase %@ On %@", headRefName, targetRefName];
+		NSString *rebaseTitle = isOnHeadBranch ? @"Rebase" : [NSString stringWithFormat:@"Rebase %@ on %@", headRefName, targetRefName];
 		[items addObject:[PBRefMenuItem itemWithTitle:rebaseTitle action:@selector(rebaseHeadBranch:) enabled:!isOnHeadBranch]];
 
 		[items addObject:[PBRefMenuItem separatorItem]];
@@ -102,7 +102,7 @@
 	// push
 	if (isRemote || [ref isRemoteBranch]) {
 		// push updates to remote
-		NSString *pushTitle = [NSString stringWithFormat:@"Push Updates To %@", remoteName];
+		NSString *pushTitle = [NSString stringWithFormat:@"Push Updates to %@", remoteName];
 		[items addObject:[PBRefMenuItem itemWithTitle:pushTitle action:@selector(pushUpdatesToRemote:) enabled:YES]];
 	}
 	else if (isDetachedHead) {
@@ -113,14 +113,14 @@
 		BOOL hasDefaultRemote = NO;
 		if (![ref isTag] && hasRemote) {
 			hasDefaultRemote = YES;
-			NSString *pushTitle = [NSString stringWithFormat:@"Push %@ To %@", targetRefName, remoteName];
+			NSString *pushTitle = [NSString stringWithFormat:@"Push %@ to %@", targetRefName, remoteName];
 			[items addObject:[PBRefMenuItem itemWithTitle:pushTitle action:@selector(pushDefaultRemoteForRef:) enabled:YES]];
 		}
 
 		// push to remotes submenu
 		NSArray *remoteNames = [repo remotes];
 		if ([remoteNames count] && !(hasDefaultRemote && ([remoteNames count] == 1))) {
-			NSString *pushToTitle = [NSString stringWithFormat:@"Push %@ To", targetRefName];
+			NSString *pushToTitle = [NSString stringWithFormat:@"Push %@ to", targetRefName];
 			PBRefMenuItem *pushToItem = [PBRefMenuItem itemWithTitle:pushToTitle action:nil enabled:YES];
 			NSMenu *remotesMenu = [[NSMenu alloc] initWithTitle:@"remotesMenu"];
 			for (NSString *remote in remoteNames) {
@@ -152,6 +152,11 @@
         [items addObject:[PBRefMenuItem itemWithTitle:changeRemoteUrlTitle action:@selector(showChangeRemoteUrlSheet:) enabled:YES]];
     }
     
+	[items addObject:[PBRefMenuItem separatorItem]];
+	
+	NSString *copyTitle = @"Copy Reference to Clipboard";
+	[items addObject:[PBRefMenuItem itemWithTitle:copyTitle action:@selector(copyRefName:) enabled:!isDetachedHead]];
+	
 	for (PBRefMenuItem *item in items) {
 		[item setTarget:target];
 		[item setRefish:ref];

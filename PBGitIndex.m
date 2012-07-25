@@ -505,13 +505,27 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 		NSStringEncoding encoding;
 		NSError *error = nil;
 		NSString *path = [[repository workingDirectory] stringByAppendingPathComponent:file.path];
-		NSString *contents = [NSString stringWithContentsOfFile:path
-												   usedEncoding:&encoding
-														  error:&error];
-		if (error)
-			return nil;
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:path error:&error];
 
-		return contents;
+        if (error)
+			return nil;
+        
+        NSInteger sizeOnDisk = [[fileAttributes objectForKey:NSFileSize] intValue];
+        
+        if (sizeOnDisk > 10000000) {
+            // Don't load files larger than 10MB to prevent the app from freezing.
+            return nil;
+        }
+		else {
+            NSString *contents = [NSString stringWithContentsOfFile:path
+                                                       usedEncoding:&encoding
+                                                              error:&error];
+            if (error)
+                return nil;
+            return contents;   
+        }
 	}
 
 	return [repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"diff-files", parameter, @"--", file.path, nil]];

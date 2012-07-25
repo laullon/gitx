@@ -329,9 +329,9 @@
     NSString *block;
     
     [scan scanUpToString:@"\n@@" intoString:&block];
-    [res appendString:@"<table class='diff'><thead>"];
+    [res appendString:@"<div class='diff-header'><table class='diff'><thead>"];
     [res appendString:[GLFileView parseDiffHeader:block]];
-    [res appendString:@"</td></tr></thead><tbody>"];
+    [res appendString:@"</td></tr></thead></table></div><div class='diff-body'><table class='diff'><tbody>"];
     
     if([block rangeOfString:@"Binary files"].location!=NSNotFound){
         [res appendString:[GLFileView parseBinaryDiff:block]];
@@ -342,7 +342,7 @@
         [res appendString:[GLFileView parseDiffChunk:[NSString stringWithFormat:@"@@%@",block]]];
     }
     
-    [res appendString:@"</tbody></table>"];
+    [res appendString:@"</tbody></table></div>"];
     
     return res;
 }

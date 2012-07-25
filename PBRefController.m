@@ -321,6 +321,16 @@
 }
 
 
+- (void) copyRefName:(PBRefMenuItem *)sender
+{
+	PBGitRef *ref = (PBGitRef *)[sender refish];
+	
+	NSPasteboard *pasteBoard =[NSPasteboard generalPasteboard];
+	[pasteBoard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
+	[pasteBoard setString:[ref shortName] forType: NSStringPboardType];
+}
+
+
 - (void)showChangeRemoteUrlSheet:(PBRefMenuItem *)sender
 {
     [PBChangeRemoteUrlSheet showChangeRemoteUrlSheetAtRefish:(PBGitRef *)[sender refish] inRepository:historyController.repository];

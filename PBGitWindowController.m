@@ -135,6 +135,9 @@
     
 	[self setNextResponder: contentController];
 	[[self window] makeFirstResponder:[contentController firstResponder]];
+	if ([PBGitDefaults refreshAutomatically]) {
+		[contentController refresh:self];
+	}
 	[contentController addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:@"statusChange"];
 }
 
@@ -175,7 +178,7 @@
 - (void)windowDidBecomeKey:(NSNotification *)notification
 {
 	if ([PBGitDefaults refreshAutomatically]) {
-		[contentController refresh:nil];
+		[contentController refresh:self];
 	}
 	
 	if ([PBGitDefaults isUseITerm2]) {

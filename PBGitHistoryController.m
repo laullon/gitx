@@ -254,8 +254,6 @@
         if (isBusy && !repository.revisionList.isUpdating) {
             if (selectedCommit && [repository commitForSHA:[selectedCommit sha]])
                 [self selectCommit:[selectedCommit sha]];
-            else if ([repository.currentBranch isSimpleRef])
-                [self selectCommit:[repository shaForRef:[repository.currentBranch ref]]];
             else
                 [self selectCommit:[[self firstCommit] sha]];
         }
