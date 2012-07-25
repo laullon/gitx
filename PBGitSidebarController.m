@@ -149,7 +149,7 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 			
 			BOOL added = NO;
 			for (PBGitMenuItem *addedItems in [submodules children]) {
-				if ([[submodule path] hasPrefix:[(id)[addedItems sourceObject] path]]) {
+				if ([[submodule path] hasPrefix:[NSString  stringWithFormat:@"%@/", [(id)[addedItems sourceObject] path]]]) {
 					[addedItems addChild:item];
 					added = YES;
 				}

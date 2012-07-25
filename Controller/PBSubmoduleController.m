@@ -40,7 +40,7 @@
         for (PBGitSubmodule *submodule in loadedSubmodules) {
             BOOL added = NO;
             for (PBGitSubmodule *addedItem in groupedSubmodules) {
-                if ([[submodule path] hasPrefix:[addedItem path]]) {
+                if ([[submodule path] hasPrefix:[NSString stringWithFormat:@"%@/", [addedItem path]]]) {
                     [addedItem addSubmodule:submodule];
                     added = YES;
                 }
