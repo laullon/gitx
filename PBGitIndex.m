@@ -10,6 +10,7 @@
 #import "PBGitRepository.h"
 #import "PBGitBinary.h"
 #import "PBEasyPipe.h"
+#import "PBGitDefaults.h"
 #import "NSString_RegEx.h"
 #import "PBChangedFile.h"
 
@@ -497,7 +498,10 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 		if (file.status == NEW)
 			return [repository outputForArguments:[NSArray arrayWithObjects:@"show", indexPath, nil]];
 
-		return [repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"diff-index", parameter, @"--cached", [self parentTree], @"--", file.path, nil]];
+        NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"diff-index", parameter, @"--cached", [self parentTree], @"--", file.path, nil];
+        if (![PBGitDefaults showWhitespaceDifferences])
+            [arguments insertObject:@"-w" atIndex:2];
+		return [repository outputInWorkdirForArguments:arguments];
 	}
 
 	// unstaged
@@ -528,7 +532,10 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
         }
 	}
 
-	return [repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"diff-files", parameter, @"--", file.path, nil]];
+    NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"diff-files", parameter, @"--", file.path, nil];
+    if (![PBGitDefaults showWhitespaceDifferences])
+        [arguments insertObject:@"-w" atIndex:2];
+	return [repository outputInWorkdirForArguments:arguments];
 }
 
 - (void)postIndexChange

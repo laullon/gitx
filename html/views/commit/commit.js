@@ -67,6 +67,11 @@ var showFileChanges = function(file, cached) {
 	if (changes == "") {
 		notify("This file has no more changes", 1);
 		return;
+    }
+    else if (!changes){
+        notify("No changes in diff. Only whitespace changes?", 1);
+        diff.innerHTML = "";
+        return;
 	}
 
 	displayDiff(changes, cached);
