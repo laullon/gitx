@@ -70,7 +70,7 @@
 - (NSRect)infoButtonRectForBounds:(NSRect)bounds {
 	CGFloat infoButtonWidth = 17.0f;
 	CGFloat infoButtonHeight = 11.0f;
-	return NSMakeRect(NSMaxX(bounds) - infoButtonWidth, NSMinY(bounds) + (NSHeight(bounds) - infoButtonHeight)/2.0f, infoButtonWidth, infoButtonHeight);
+	return NSMakeRect(NSMaxX(bounds) - infoButtonWidth, ceil(NSMinY(bounds) + (NSHeight(bounds) - infoButtonHeight)/2.0f), infoButtonWidth, infoButtonHeight);
 }
 
 - (NSImage *)infoButtonImage {
