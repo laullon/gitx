@@ -111,17 +111,17 @@
             lastFile=file;
             
             NSString *fileTxt = @"";
-            if(startFile==@"fileview"){
+            if([@"fileview" isEqualToString:startFile]){
                 fileTxt=[file textContents:&theError];
                 if(!theError)
                     fileTxt=[GLFileView escapeHTML:fileTxt];
-            }else if(startFile==@"blame"){
+            }else if([@"blame" isEqualToString:startFile]){
                 fileTxt=[file blame:&theError];
                 if(!theError)
                     fileTxt=[self parseBlame:fileTxt];
-            }else if(startFile==@"log"){
+            }else if([@"log" isEqualToString:startFile]){
                 fileTxt=[file log:logFormat error:&theError];		
-            }else if(startFile==@"diff"){
+            }else if([@"diff" isEqualToString:startFile]){
                 fileTxt=[file diff:diffType error:&theError];
                 if(!theError)
                     fileTxt=[GLFileView parseDiff:fileTxt];
@@ -133,7 +133,7 @@
                 fileTxt=[fileTxt stringByReplacingOccurrencesOfString:@"\t" withString:@"&nbsp;&nbsp;&nbsp;&nbsp;"];
                 DLog(@"file.sha='%@'",file.sha);
                 fileTxt=[fileTxt stringByReplacingOccurrencesOfString:@"{SHA_PREV}" withString:file.sha];
-                if(diffType==@"h") {
+                if([@"h" isEqualToString:diffType]) {
                     fileTxt=[fileTxt stringByReplacingOccurrencesOfString:@"{SHA}" withString:@"HEAD"];
                 }else {
                     fileTxt=[fileTxt stringByReplacingOccurrencesOfString:@"{SHA}" withString:@"--"];
@@ -219,7 +219,7 @@
 		startFile=identifier;
 	}else if(groupNumber==1){
 		diffType=identifier;
-		if(startFile==@"diff"){
+		if([@"diff" isEqualToString:startFile]){
 			[[view mainFrame] reload];
 		}
 	}
@@ -294,10 +294,10 @@
 		[res appendString:[NSString stringWithFormat:@"<a class='%@' href='#%@' representedFile='%@'>%@</a>",status,file,fileName,txt]];
 		[res appendString:@"</td><td class='bar'>"];
 		[res appendString:@"<div>"];
-		[res appendString:[NSString stringWithFormat:@"<span class='add' style='width:%d%%'></span>",((add*100)/granTotal)]];
-		[res appendString:[NSString stringWithFormat:@"<span class='rem' style='width:%d%%'></span>",((rem*100)/granTotal)]];
+		[res appendString:[NSString stringWithFormat:@"<span class='add' style='width:%ld%%'></span>",((add*100)/granTotal)]];
+		[res appendString:[NSString stringWithFormat:@"<span class='rem' style='width:%ld%%'></span>",((rem*100)/granTotal)]];
 		[res appendString:@"</div>"];
-		[res appendString:[NSString stringWithFormat:@"</td><td class='add'>+ %d</td><td class='rem'>- %d</td></tr>",add,rem]];
+		[res appendString:[NSString stringWithFormat:@"</td><td class='add'>+ %ld</td><td class='rem'>- %ld</td></tr>", (long)add, (long)rem]];
 	}
 	[res appendString:@"</table>"];
 	return res;

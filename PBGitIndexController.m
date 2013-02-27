@@ -218,8 +218,8 @@
     NSString *messageText;
     NSString *informativeText;
     if ([files count] > 1) {
-        messageText = [NSString stringWithFormat:@"Delete %d files?",[files count]];
-        informativeText = [NSString stringWithFormat:@"Are you sure you want to move the selected %d files to the trash?\n\nYou cannot undo this operation.",[files count]];
+        messageText = [NSString stringWithFormat:@"Delete %lu files?", (unsigned long)[files count]];
+        informativeText = [NSString stringWithFormat:@"Are you sure you want to move the selected %lu files to the trash?\n\nYou cannot undo this operation.", (unsigned long)[files count]];
     }
     else {
         messageText = @"Delete file?";
@@ -235,7 +235,7 @@
 									 defaultButton:@"Delete"
 								   alternateButton:@"Cancel"
 									   otherButton:nil
-						 informativeTextWithFormat:informativeText];
+						 informativeTextWithFormat:@"%@", informativeText];
     [alert setShowsSuppressionButton:YES];
 	
 	[alert beginSheetModalForWindow:[[commitController view] window]

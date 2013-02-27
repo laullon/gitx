@@ -132,7 +132,7 @@ const NSString *kAuthorKeyDate = @"date";
             NSString *diffs = [GLFileView parseDiff:d];
             html = [NSString stringWithFormat:@"%@%@%@",header,fileList,diffs];
         } else {
-            html = [NSString stringWithFormat:@"%@%@<div id='diffs'><p>This is a very large commit. It may take a long time to load the diff. Click <a href='' onclick='showFullDiff(); return false;'>here</a> to show anyway.</p></div>",header,fileList,currentSha];
+            html = [NSString stringWithFormat:@"%@%@<div id='diffs'><p>This is a very large commit. It may take a long time to load the diff. Click <a href='' onclick='showFullDiff(); return false;'>here</a> to show anyway.</p></div>",header,fileList];
         }
 
         html = [html stringByReplacingOccurrencesOfString:@"{SHA_PREV}" withString:[NSString stringWithFormat:@"%@^",currentSha]];
