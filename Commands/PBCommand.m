@@ -55,7 +55,7 @@
 									defaultButton:nil
 								  alternateButton:@"Cancel"
 									  otherButton:nil
-						informativeTextWithFormat:[NSString stringWithFormat:@"Are you sure you wish to perform this action?\n\n%@?",self.commandDescription]]
+						informativeTextWithFormat:@"Are you sure you wish to perform this action?\n\n%@?",self.commandDescription]
 					runModal];
 	}
 	
