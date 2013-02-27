@@ -182,7 +182,10 @@
 {
 	SEL selector = NSSelectorFromString([arguments objectAtIndex:0]);
 	id object = [arguments objectAtIndex:1];
+#pragma clang diagnostics push
+#pragma clang diagnostics ignore "-Wselector"
 	id ret = [object performSelector:selector];
+#pragma clang diagnostics pop
 	NSArray *returnArray = [NSArray arrayWithObjects:[NSThread currentThread], ret, nil];
 	[self performSelectorOnMainThread:@selector(threadFinished:) withObject:returnArray waitUntilDone:NO];
 }

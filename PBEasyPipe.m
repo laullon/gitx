@@ -17,7 +17,7 @@
 
 + (NSTask *) taskForCommand:(NSString *)cmd withArgs:(NSArray *)args inDir:(NSString *)dir
 {
-	NSMutableArray *filteredArguments = [[NSMutableArray alloc] init];
+	NSMutableArray *filteredArguments = [[[NSMutableArray alloc] init] autorelease];
 	for (NSString *param in args) {
 		if ([param length] > 0) {
 			[filteredArguments addObject:param];
@@ -39,7 +39,7 @@
 	NSPipe* pipe = [NSPipe pipe];
 	[task setStandardOutput:pipe];
 	[task setStandardError:pipe];
-	return task;
+	return [task autorelease];
 }
 
 + (NSFileHandle*) handleForCommand: (NSString*) cmd withArgs: (NSArray*) args inDir: (NSString*) dir
@@ -80,7 +80,7 @@
 	NSTask *task = [self taskForCommand:cmd withArgs:args inDir:dir];
 
 	if (dict) {
-		NSMutableDictionary *env = [[[NSProcessInfo processInfo] environment] mutableCopy];
+		NSMutableDictionary *env = [[[[NSProcessInfo processInfo] environment] mutableCopy] autorelease];
 		[env addEntriesFromDictionary:dict];
 		[task setEnvironment:env];
 	}
@@ -97,9 +97,9 @@
 	[task launch];
 	
 	NSData* data = [handle readDataToEndOfFile];
-	NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	NSString *string = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
 	if (!string)
-		string = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
+		string = [[[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding] autorelease];
 	
 	// Strip trailing newline
 	if ([string hasSuffix:@"\n"])

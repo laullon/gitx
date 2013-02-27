@@ -55,7 +55,7 @@ OSStatus			StorePasswordKeychain (const char *url, UInt32 urlLength, void* passw
 @implementation GAPAppDelegate 
 
 -(void)yesNo:(NSString *)prompt url:(NSString *)url{
-    NSAlert *alert = [[NSAlert alloc] init];
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert addButtonWithTitle:@"YES"];
     [alert addButtonWithTitle:@"NO"];
     [alert setMessageText:[NSString stringWithFormat:@"%@?",url]];
@@ -77,7 +77,7 @@ OSStatus			StorePasswordKeychain (const char *url, UInt32 urlLength, void* passw
     
     NSRect box = NSMakeRect(0, 0, 200, 24);
     
-    NSSecureTextField * passView = [[NSSecureTextField alloc] initWithFrame: box];
+    NSSecureTextField * passView = [[[NSSecureTextField alloc] initWithFrame: box] autorelease];
     [passView setSelectable: YES];
     [passView setEditable: YES];
     [passView setBordered: YES];
@@ -86,7 +86,7 @@ OSStatus			StorePasswordKeychain (const char *url, UInt32 urlLength, void* passw
     [passView selectText: self];
     
     
-    NSAlert *alert = [[NSAlert alloc] init];
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert addButtonWithTitle:@"Ok"];
     [alert addButtonWithTitle:@"cancel"];
     [alert setMessageText:[NSString stringWithFormat:@"%@?",url]];
@@ -141,6 +141,7 @@ void getproclline(pid_t pid, char *command_name)
 	
 	size = (size_t)argmax;
 	if (sysctl(mib, 3, procargs, &size, NULL, 0) == -1) {
+		free(procargs);
 		return;
 	}
 	
@@ -155,6 +156,7 @@ void getproclline(pid_t pid, char *command_name)
 		}
 	}
 	if (cp == &procargs[size]) {
+		free(procargs);
 		return;
 	}
 	
@@ -166,6 +168,7 @@ void getproclline(pid_t pid, char *command_name)
 		}
 	}
 	if (cp == &procargs[size]) {
+		free(procargs);
 		return;
 	}
 	/* Save where the argv[0] string starts. */
@@ -226,7 +229,7 @@ int	main( int argc, const char* argv[] )
 	TransformProcessType( &myPSN, kProcessTransformToForegroundApplication );
 	
 	NSApplication *app = [NSApplication sharedApplication];
-	GAPAppDelegate *appDel = [[GAPAppDelegate alloc] init];
+	GAPAppDelegate *appDel = [[[GAPAppDelegate alloc] init] autorelease];
 	[app setDelegate:appDel];
     
 	

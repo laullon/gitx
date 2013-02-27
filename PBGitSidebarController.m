@@ -418,7 +418,7 @@ NSString *kObservingContextSubmodules = @"submodulesChanged";
 	if ([fetchURL isEqual:pushURL])
 		return fetchURL;
 	else	// Down triangle for fetch, up triangle for push
-		return [NSString stringWithFormat:@"\u25bc %@\n\u25b2", fetchURL, pushURL];
+		return [NSString stringWithFormat:@"\u25bc %@\n\u25b2 %@", fetchURL, pushURL];
 }
 
 - (void)populateList
