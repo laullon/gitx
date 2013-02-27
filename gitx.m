@@ -115,7 +115,7 @@ void handleSTDINDiff()
 {
 	NSFileHandle *handle = [NSFileHandle fileHandleWithStandardInput];
 	NSData *data = [handle readDataToEndOfFile];
-	NSString *diff = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	NSString *diff = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
 
 	if (diff && [diff length] > 0) {
 		GitXApplication *gitXApp = [SBApplication applicationWithBundleIdentifier:kGitXBundleIdentifier];
@@ -324,7 +324,7 @@ NSURL *workingDirectoryURL(NSMutableArray *arguments)
 
 NSMutableArray *argumentsArray()
 {
-	NSMutableArray *arguments = [[[NSProcessInfo processInfo] arguments] mutableCopy];
+	NSMutableArray *arguments = [[[[NSProcessInfo processInfo] arguments] mutableCopy] autorelease];
 	[arguments removeObjectAtIndex:0]; // url to executable path is not needed
 
 	return arguments;
