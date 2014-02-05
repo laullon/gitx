@@ -411,6 +411,7 @@
 - (IBAction) refresh:(id)sender
 {
 	[repository forceUpdateRevisions];
+	selectedCommitBeforeRefresh = NULL;
 }
 
 - (void) updateView
