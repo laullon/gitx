@@ -465,7 +465,7 @@
 
 +(NSString *)getFileName:(NSString *)line
 {
-    NSRange b = [line rangeOfString:@"b/"];
+    NSRange b = [line rangeOfString:@" b/"];
 	if (b.length == 0)
 		b = [line rangeOfString:@"--cc "];
 	
